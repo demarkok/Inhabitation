@@ -22,19 +22,19 @@ data TNF = Meta   -- метапеременная (пока еще бесстр�
              [TNF]  -- бёмовы хвостики
     deriving (Read,Show,Eq,Ord) 
 
--- a -> b -> c        |-->    (c, [a, b])
-uncurryArrow2List  :: Type -> (Type, [Type])
-uncurryArrow2List atom@(TVar _)   = (atom, [])
-uncurryArrow2List inter@(_ :^: _) = (inter, []) 
-uncurryArrow2List (t1 :-> t2)     = second (t1 : ) $ uncurryArrow2List t2
-
 -- a ^ (b -> c) ^ d    |-->    [a, b -> c, d]
 removeIntersection :: Type -> [Type]
 removeIntersection atom@(TVar _)   = [atom]
 removeIntersection arrow@(_ :-> _) = [arrow]
 removeIntersection (a :^: b)       = [a, b] >>= removeIntersection
 
--- a -> (b ^ c)        |-->    [(b, [a]), (c, [a])]
+-- a -> b -> c        |-->    (c, [a, b])
+uncurryArrow2List  :: Type -> (Type, [Type])
+uncurryArrow2List atom@(TVar _)   = (atom, [])
+uncurryArrow2List inter@(_ :^: _) = (inter, []) 
+uncurryArrow2List (t1 :-> t2)     = second (t1 : ) $ uncurryArrow2List t2
+
+-- a -> b -> (c ^ d)  |-->    [(c, [a, b]), (d, [a, b])]
 uncurry2List :: Type -> [(Symb, [Type])]
 uncurry2List atom@(TVar x) = [(x, [])] 
 uncurry2List t = do
@@ -43,15 +43,27 @@ uncurry2List t = do
   (resultingHead, nearestTail) <- removeIntersection arrowHead >>= uncurry2List
   return (resultingHead, arrowTail ++ nearestTail)
 
-{-
-uncurry2RevList :: Type -> (Type,[Type])
-uncurry2RevList = uncurry2RevList' [] where
-  uncurry2RevList' :: [Type] -> Type -> (Symb,[Type])
-  uncurry2RevList' res (TVar c) = (c, res)
-  uncurry2RevList' res (t1 :-> t2) = uncurry2RevList' (t1 : res) t2
 
---       a -> (b ^ c)   |-->   [a -> b, a -> c]
-liftIntersection :: (Type,[Type]) -> [(Type,[Type])]j
+-- a -> b -> c        |-->    (c, [b, a])
+uncurryArrow2RevList :: Type -> (Type, [Type])
+uncurryArrow2RevList = uncurryArrow2RevList' [] where
+  uncurryArrow2RevList' :: [Type] -> Type -> (Type, [Type])
+  uncurryArrow2RevList' res atom@(TVar _) = (atom, res)
+  uncurryArrow2RevList' res inter@(_ :^: _) = (inter, res) 
+  uncurryArrow2RevList' res (t1 :-> t2) = uncurryArrow2RevList' (t1 : res) t2
+
+-- a -> b -> (c ^ d)  |-->    [(c, [b, a]), (d, [b, a])]
+uncurry2RevList :: Type -> [(Symb, [Type])]
+uncurry2RevList atom@(TVar x) = [(x, [])] 
+uncurry2RevList t = do
+  t' <- removeIntersection t
+  let (arrowHead, arrowTail) = uncurryArrow2RevList t'
+  (resultingHead, nearestTail) <- removeIntersection arrowHead >>= uncurry2RevList
+  return (resultingHead, nearestTail ++ arrowTail)
+
+{-
+
+-- 
 
 unMeta :: Ctx -> TNF -> [TNF]
 unMeta zetas (TNF ctx h vs) = TNF ctx h <$> traverse (unMeta (ctx ++ zetas)) vs -- each combination of possible meta-replacement for each applicand
