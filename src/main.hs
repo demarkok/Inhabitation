@@ -4,8 +4,10 @@ import Data.List (unfoldr)
 
 type Symb = String 
 
-infixr 3 :->
-infixl 4 :^:
+infixr 3 :->  -- type arrow
+infixl 4 :^:  -- type intersection
+
+infix 1 <:    -- subtyping     p <: q   <=>    x:p |- x:q
 
 data Type = TVar Symb      -- типовой атом
           | Type :-> Type  -- стрелочный тип
@@ -14,6 +16,7 @@ data Type = TVar Symb      -- типовой атом
 
 type Ctx = [Type] -- контекст
 
+{-
 data TNF = Meta   -- метапеременная (пока еще бесструктурная часть схемы)
              Type   -- типизированна
          | TNF    -- структурированная часть схемы
@@ -21,6 +24,14 @@ data TNF = Meta   -- метапеременная (пока еще бесстр�
              Int    -- головная переменная как индекс Де Брауна
              [TNF]  -- бёмовы хвостики
     deriving (Read,Show,Eq,Ord) 
+-}
+
+data MultiTNF = Meta
+                  [Type] -- invariant: this types should'nt be :^:
+              | MultiTNF
+                  [Ctx]
+                  Int
+                  [MultiTNF]
 
 -- a ^ (b -> c) ^ d    |-->    [a, b -> c, d]
 removeIntersection :: Type -> [Type]
@@ -61,11 +72,47 @@ uncurry2RevList t = do
   (resultingHead, nearestTail) <- removeIntersection arrowHead >>= uncurry2RevList
   return (resultingHead, nearestTail ++ arrowTail)
 
+isArrow :: Type -> Bool
+isArrow (_ :-> _) = True
+isArrow _ = False
+
+-- (a :^: (b :^: c))  |-->    [a, b, c]   where a, b, c are not intersections
+intrs2List :: Type -> [Type]
+intrs2List (p :^: q) = intrs2List p ++ intrs2List q
+intrs2List t = [t]
+
+
+(<:) :: Type -> Type -> Bool
+TVar a <: TVar b = a == b
+a <: b
+  | (sA :-> tA) <- a,
+    (sB :-> tB) <- b  = (tA <: tB) && (sB <: sA)
+  | otherwise         = all (\t -> any (<:t) intrsListA) intrsListB 
+    where 
+      intrsListA = intrs2List a
+      intrsListB = intrs2List b
+
 {-
 
--- 
+unMeta :: [Ctx] -> MultiTNF -> [MultiTNF]
+unMeta ctxts (MultiTNF abstractors h vs) = MultiTNF abstractors h <$> traverse (unMeta (zipWith (++) abstractors ctxts)) vs
+unMeta ctxts (Meta ts) = do
+  let ts'     = uncurry2RevList <$> ts -- :: [[(Symb, [Type])]] 
+  let ctxts'  = zipWith (<$) ctxts ts'
+  let ts''    = concat ts'
+  let ctxts'' = concat ctxts'
 
-unMeta :: Ctx -> TNF -> [TNF]
+
+  | all isArrow ts = unmeta ctxts MultiTNF abstractors 
+
+   do
+  let (slpha, sigmas) 
+
+-}
+
+{-
+-- each TNF has the same structure (but different types in the abstractor)
+unMeta :: [(Ctx, TNF)] -> [TNF]
 unMeta zetas (TNF ctx h vs) = TNF ctx h <$> traverse (unMeta (ctx ++ zetas)) vs -- each combination of possible meta-replacement for each applicand
 unMeta zetas (Meta t) = do
   let (alpha, sigmas) = uncurry2RevList t -- t = sigma_1 -> sigma_2 -> ... -> alpha
