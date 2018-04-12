@@ -33,19 +33,19 @@ data MultiTNF = Meta
                   Int
                   [MultiTNF]
 
--- a ^ (b -> c) ^ d    |-->    [a, b -> c, d]
+-- (a ^ (b -> c)) ^ d   |-->    [a, b -> c, d]
 removeIntersection :: Type -> [Type]
 removeIntersection atom@(TVar _)   = [atom]
 removeIntersection arrow@(_ :-> _) = [arrow]
 removeIntersection (a :^: b)       = [a, b] >>= removeIntersection
 
--- a -> b -> c        |-->    (c, [a, b])
+-- a -> b -> c          |-->    (c, [a, b])
 uncurryArrow2List  :: Type -> (Type, [Type])
 uncurryArrow2List atom@(TVar _)   = (atom, [])
 uncurryArrow2List inter@(_ :^: _) = (inter, []) 
 uncurryArrow2List (t1 :-> t2)     = second (t1 : ) $ uncurryArrow2List t2
 
--- a -> b -> (c ^ d)  |-->    [(c, [a, b]), (d, [a, b])]
+-- a -> b -> (c ^ d)    |-->    [(c, [a, b]), (d, [a, b])]
 uncurry2List :: Type -> [(Symb, [Type])]
 uncurry2List atom@(TVar x) = [(x, [])] 
 uncurry2List t = do
@@ -55,7 +55,7 @@ uncurry2List t = do
   return (resultingHead, arrowTail ++ nearestTail)
 
 
--- a -> b -> c        |-->    (c, [b, a])
+-- a -> b -> c          |-->    (c, [b, a])
 uncurryArrow2RevList :: Type -> (Type, [Type])
 uncurryArrow2RevList = uncurryArrow2RevList' [] where
   uncurryArrow2RevList' :: [Type] -> Type -> (Type, [Type])
@@ -63,7 +63,7 @@ uncurryArrow2RevList = uncurryArrow2RevList' [] where
   uncurryArrow2RevList' res inter@(_ :^: _) = (inter, res) 
   uncurryArrow2RevList' res (t1 :-> t2) = uncurryArrow2RevList' (t1 : res) t2
 
--- a -> b -> (c ^ d)  |-->    [(c, [b, a]), (d, [b, a])]
+-- a -> b -> (c ^ d)    |-->    [(c, [b, a]), (d, [b, a])]
 uncurry2RevList :: Type -> [(Symb, [Type])]
 uncurry2RevList atom@(TVar x) = [(x, [])] 
 uncurry2RevList t = do
@@ -76,21 +76,15 @@ isArrow :: Type -> Bool
 isArrow (_ :-> _) = True
 isArrow _ = False
 
--- (a :^: (b :^: c))  |-->    [a, b, c]   where a, b, c are not intersections
-intrs2List :: Type -> [Type]
-intrs2List (p :^: q) = intrs2List p ++ intrs2List q
-intrs2List t = [t]
-
-
 (<:) :: Type -> Type -> Bool
 TVar a <: TVar b = a == b
 a <: b
   | (sA :-> tA) <- a,
     (sB :-> tB) <- b  = (tA <: tB) && (sB <: sA)
-  | otherwise         = all (\t -> any (<:t) intrsListA) intrsListB 
+  | otherwise         = all (\t -> any (<:t) a') b' -- for all t in b' thers's an s <: t in a'.
     where 
-      intrsListA = intrs2List a
-      intrsListB = intrs2List b
+      a' = removeIntersection a
+      b' = removeIntersection b
 
 {-
 
