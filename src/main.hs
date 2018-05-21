@@ -106,27 +106,28 @@ unMeta ctxts (Meta ts) = do
   -- our goal is to find an inhabitant of the type ts''[i] in the context ctxts''[i] for each i
 
   -- find subtask with the shortest list of arguments.
-  let (minArgLen, shortestTypeInd)    = minimum $ zip ((length . snd) <$> ts'') [0..]
+  let (minArgLen, shortestTypeInd) = minimum $ zip ((length . snd) <$> ts'') [0..]
   
   -- bite minArgLen arguments out of all the subtasks
   -- NB: type order in each abstractor is reversed (in contrast with the order in the normal type notation 1 -> 2 -> 3)
   --     type order in heads (ts''') is normal (1 -> 2 -> 3 -> x)
+  
   let (abstractors, ts''') = unzip $ do
-    (x, args) <- ts'' 
-    let abstractor  = reverse $ take minArgLen args
-    let restType    = (x, drop minArgLen args)
-    return (abstractor, restType)
+      (x, args) <- ts'' 
+      let abstractor  = reverse $ take minArgLen args
+      let restType    = (x, drop minArgLen args)
+      return (abstractor, restType)
+  
+
+  -- let (abstractors, ts''') = undefined
     
 
   -- let revAbstractors = (\(h, t) -> (h, reverse t)) <$> abstractors
   
   let palettes = zipWith (++) abstractors ctxts'' -- context complemented with abstractors
 
-  -- candHeadInd <- [0..(minArgLen + len (ctxt'' !! 0))] -- possible candidate
-  -- guard $ 
-
-  let palette = palettes  ! shortestTypeInd -- get the full context for the variable
-  let (v, []) = ts'''     ! shortestTypeInd -- get the variable name
+  let palette = palettes  !! shortestTypeInd -- get the full context for the variable
+  let (v, []) = ts'''     !! shortestTypeInd -- get the variable name
 
   (candHead, candHeadInd) <- zip palette [0..] -- choose one possible head from the full context
                                                -- now head isn't expanded
@@ -144,10 +145,10 @@ unMeta ctxts (Meta ts) = do
 
   tails <- sequenceA $ do 
     (subtaskPalette, subtaskType) <- zip palettes  ts'''
-    let expandedHeadToCheck = uncurry2List $ subtaskPalette ! candHeadInd
+    let expandedHeadToCheck = uncurry2List $ subtaskPalette !! candHeadInd
     return $ do 
       (subtW, subtHeadArgs) <- expandedHeadToCheck
-      guard $ length subtHeadArgs >= k and (curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType)
+      guard $ length subtHeadArgs >= k && ((curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
       return $ take k subtHeadArgs
 
   return $ MultiTNF abstractors candHeadInd (Meta <$> tails)
