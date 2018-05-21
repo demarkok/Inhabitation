@@ -110,13 +110,7 @@ unMeta ctxts (Meta ts) = do
       let abstractor  = reverse $ take minArgLen args
       let restType    = (x, drop minArgLen args)
       return (abstractor, restType)
-  
-
-  -- let (abstractors, ts''') = undefined
     
-
-  -- let revAbstractors = (\(h, t) -> (h, reverse t)) <$> abstractors
-  
   let palettes = zipWith (++) abstractors ctxts'' -- context complemented with abstractors
 
   let palette = palettes  !! shortestTypeInd -- get the full context for the variable
