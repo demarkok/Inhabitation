@@ -1,6 +1,6 @@
 import Control.Arrow (second)
 import Control.Monad (guard)
-import Data.List (unfoldr)
+import Data.List (unfoldr, transpose)
 
 type Symb = String 
 
@@ -31,7 +31,8 @@ data MultiTNF = Meta
               | MultiTNF
                   [Ctx]
                   Int
-                  [MultiTNF]
+                  [MultiTNF] 
+    deriving (Read,Show,Eq,Ord) 
 
 -- (a ^ (b -> c)) ^ d   |-->    [a, b -> c, d]
 removeIntersection :: Type -> [Type]
@@ -73,7 +74,7 @@ uncurry2RevList t = do
   return (resultingHead, nearestTail ++ arrowTail)
 
 curryFromList :: (Symb, [Type]) -> Type
-curryFromList (h, rest) = (foldr1 (:->) rest) :-> TVar h
+curryFromList (h, rest) = foldr (:->) (TVar h) rest
 
 curryFromRevList :: (Symb, [Type]) -> Type
 curryFromRevList (h, rest) = curryFromList (h, reverse rest)
@@ -151,13 +152,7 @@ unMeta ctxts (Meta ts) = do
       guard $ length subtHeadArgs >= k && ((curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
       return $ take k subtHeadArgs
 
-  return $ MultiTNF abstractors candHeadInd (Meta <$> tails)
-
-
-
-
-  
-
+  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails)
 
 
 {-
@@ -195,3 +190,45 @@ inhabs :: Type -> [TNF]
 inhabs = concat . inhabGens
 
 -}
+
+
+
+
+  
+tArr = TVar "a" :-> TVar "a"
+
+tNat = tArr :-> tArr
+
+tBool = TVar "a" :-> TVar "a" :-> TVar "a"
+
+tK = TVar "a" :-> TVar "b" :-> TVar "a"
+
+tKast = TVar "a" :-> TVar "b" :-> TVar "b"
+
+tBiNat = (TVar "a" :-> TVar "a") :-> (TVar "a" :-> TVar "a") :-> TVar "a" :-> TVar "a"
+
+tBiBiNat = (TVar "a" :-> TVar "b") :-> (TVar "b" :-> TVar "a") :-> TVar "a" :-> TVar "a"
+
+tBinTree = (TVar "a" :-> TVar "a" :-> TVar "a") :-> TVar "a" :-> TVar "a"
+
+hw3last1 = ((TVar "a" :-> TVar "b") :-> TVar "a") :-> (TVar "a" :-> TVar "a" :-> TVar "b") :-> TVar "a"
+
+hw3last2 = ((TVar "a" :-> TVar "b") :-> TVar "a") :-> (TVar "a" :-> TVar "a" :-> TVar "b") :-> TVar "b"
+
+t3 = ((TVar "a" :-> TVar "a") :-> TVar "a") :-> TVar "a"
+
+contFmapT = (TVar "a" :-> TVar "b") :->  ((TVar "a" :-> TVar "c") :-> TVar "d")
+               :-> (TVar "b" :-> TVar "c") :-> TVar "d"
+
+selFmapT = (TVar "a" :-> TVar "b") :->  ((TVar "a" :-> TVar "c") :-> TVar "a") 
+               :-> (TVar "b" :-> TVar "c") :-> TVar "b"
+
+monsterT = (((TVar "a" :-> TVar "a") :-> TVar "a") :-> TVar "a") :-> TVar "a" :-> TVar "a"
+
+fixT = (TVar "a" :-> TVar "a") :-> TVar "a"
+
+peirceT = ((TVar "p" :-> TVar "q") :-> TVar "p") :-> TVar "p"
+
+
+t1 = unMeta [[]] (Meta [tArr])
+t2 = unMeta [[]] (Meta [tNat])
