@@ -10,7 +10,6 @@ tNat = tArr :-> tArr
 
 tBool = TVar "a" :-> TVar "a" :-> TVar "a"
 
-
 test1 = unMeta [[]] (Meta [tArr])
 test2 = unMeta [[]] (Meta [tNat])
 test3 = unMeta [[]] (Meta [tBool])
@@ -35,15 +34,29 @@ test6 = inhabs (τ1 :^: τ2) where
 test7 = inhabs (TVar "a" :-> TVar "b" :-> TVar "a")
 
 
+exp_type :: Int -> Type
+exp_type n = foldl1 (:^:) (τ <$> [1..n]) where
+    τ i = foldr1 (:->) (q i <$> [0..(n + 1)])
+    q i j
+        | j == 0       = TVar "a"
+        | j == (n + 1) = TVar "b"
+        | j == i       = TVar "a" :-> TVar "b"
+        | j < i        = (TVar "a" :-> TVar "a") :^: (TVar "b" :-> TVar "b")
+        | j > i        = TVar "b" :-> TVar "a"
+
+test8 = inhabs $ exp_type 3
+
+
 inCurryStyle :: MultiTNF -> String
 inCurryStyle (MultiTNF abstractors h applicands)
-    | null $ abstractors !! 0 = show h
+    | null $ abstractors !! 0 = (shows h) . (showApp applicands) $ ""
     | otherwise = 
         (showString "{") . 
         (shows $ length $ (abstractors !! 0)) .
         (showString "}") .
         (showString "(") .
         (shows h) .
-        (foldr (.) id $ (showString . showString " ") <$> inCurryStyle <$> applicands) .
+        (showApp applicands) .
         (showString ")") $ 
-        ""
+        ""  where
+        showApp l = foldr (.) id $ (showString . showString " ") <$> inCurryStyle <$> applicands

@@ -113,7 +113,6 @@ unMeta ctxts (Meta ts) = do
   -- bite minArgLen arguments out of all the subtasks
   -- NB: type order in each abstractor is reversed (in contrast with the order in the normal type notation 1 -> 2 -> 3)
   --     type order in heads (ts''') is normal (1 -> 2 -> 3 -> x)
-  
   let (abstractors, ts''') = unzip $ do
       (x, args) <- ts'' 
       let abstractor  = reverse $ take minArgLen args
@@ -126,7 +125,7 @@ unMeta ctxts (Meta ts) = do
   let (v, []) = ts'''     !! shortestTypeInd -- get the variable name
 
   (candHead, candHeadInd) <- zip palette [0..] -- choose one possible head from the full context
-                                               -- now head isn't expanded
+                                               -- at this moment head isn't expanded
 
   let expandedCandHead = uncurry2List candHead -- expand the head
 
@@ -149,7 +148,7 @@ unMeta ctxts (Meta ts) = do
 
 
 
-  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) -- TODO: FIX TYPE ORDER IN ABSTRACTORS!
+  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) -- TODO: FIX TYPE ORDER IN ABSTRACTORS
 
 
 
