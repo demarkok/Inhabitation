@@ -8,15 +8,17 @@ type Symb = String
 
 infixr 3 :->  -- type arrow
 infixl 4 :^:  -- type intersection
+infix  1 <:    -- subtyping     p <: q   <=>    x:p |- x:q
 
-infix 1 <:    -- subtyping     p <: q   <=>    x:p |- x:q
 
 data Type = TVar Symb      -- типовой атом
           | Type :-> Type  -- стрелочный тип
           | Type :^: Type   -- пересечение
     deriving (Read,Show,Eq,Ord)
 
+
 type Ctx = [Type] -- контекст
+
 
 data MultiTNF = Meta
                   [Type] -- invariant: this types shouldn't be :^:
@@ -26,17 +28,20 @@ data MultiTNF = Meta
                   [MultiTNF] 
     deriving (Read,Show,Eq,Ord) 
 
+
 -- (a ^ (b -> c)) ^ d   |-->    [a, b -> c, d]
 removeIntersection :: Type -> [Type]
 removeIntersection atom@(TVar _)   = [atom]
 removeIntersection arrow@(_ :-> _) = [arrow]
 removeIntersection (a :^: b)       = [a, b] >>= removeIntersection
 
+
 -- a -> b -> c          |-->    (c, [a, b])
 uncurryArrow2List  :: Type -> (Type, [Type])
 uncurryArrow2List atom@(TVar _)   = (atom, [])
 uncurryArrow2List inter@(_ :^: _) = (inter, []) 
 uncurryArrow2List (t1 :-> t2)     = second (t1 : ) $ uncurryArrow2List t2
+
 
 -- a -> b -> (c ^ d)    |-->    [(c, [a, b]), (d, [a, b])]
 uncurry2List :: Type -> [(Symb, [Type])]
@@ -56,6 +61,7 @@ uncurryArrow2RevList = uncurryArrow2RevList' [] where
   uncurryArrow2RevList' res inter@(_ :^: _) = (inter, res) 
   uncurryArrow2RevList' res (t1 :-> t2) = uncurryArrow2RevList' (t1 : res) t2
 
+
 -- a -> b -> (c ^ d)    |-->    [(c, [b, a]), (d, [b, a])]
 uncurry2RevList :: Type -> [(Symb, [Type])]
 uncurry2RevList atom@(TVar x) = [(x, [])] 
@@ -65,8 +71,10 @@ uncurry2RevList t = do
   (resultingHead, nearestTail) <- removeIntersection arrowHead >>= uncurry2RevList
   return (resultingHead, nearestTail ++ arrowTail)
 
+
 curryFromList :: (Symb, [Type]) -> Type
 curryFromList (h, rest) = foldr (:->) (TVar h) rest
+
 
 curryFromRevList :: (Symb, [Type]) -> Type
 curryFromRevList (h, rest) = curryFromList (h, reverse rest)
@@ -75,6 +83,7 @@ curryFromRevList (h, rest) = curryFromList (h, reverse rest)
 isArrow :: Type -> Bool
 isArrow (_ :-> _) = True
 isArrow _ = False
+
 
 (<:) :: Type -> Type -> Bool
 TVar a <: TVar b = a == b
@@ -138,4 +147,36 @@ unMeta ctxts (Meta ts) = do
       guard $ length subtHeadArgs >= k && ((curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
       return $ take k subtHeadArgs
 
-  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails)
+
+
+  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) -- TODO: FIX TYPE ORDER IN ABSTRACTORS!
+
+
+
+isTerm :: MultiTNF -> Bool
+isTerm (Meta _) = False
+isTerm (MultiTNF _ _ applicands) = all isTerm applicands
+
+
+size :: MultiTNF -> Int
+size (Meta types) = length types
+size (MultiTNF abstractors _ _) = length abstractors
+
+
+allTNFGens :: Type -> [[MultiTNF]]
+allTNFGens tau = start : unfoldr step start where
+  start = [Meta [tau]]
+  step :: [MultiTNF] -> Maybe ([MultiTNF], [MultiTNF])
+  step old
+    | all isTerm old = Nothing
+    | null new = Nothing -- is Empty
+    | otherwise = Just (new, new) where
+      new = filter (not. isTerm) old >>= (\mtnf -> unMeta (replicate (size mtnf) []) mtnf)
+
+
+inhabGens :: Type -> [[MultiTNF]]
+inhabGens = map (filter isTerm) . allTNFGens
+
+
+inhabs :: Type -> [MultiTNF]
+inhabs = concat . inhabGens
