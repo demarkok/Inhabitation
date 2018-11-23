@@ -4,6 +4,8 @@ import Control.Arrow (second)
 import Control.Monad (guard)
 import Data.List (unfoldr, transpose)
 
+-- import Debug.Trace
+
 type Symb = String 
 
 infixr 3 :->  -- type arrow
@@ -11,13 +13,13 @@ infixl 4 :^:  -- type intersection
 infix  1 <:    -- subtyping     p <: q   <=>    x:p |- x:q
 
 
-data Type = TVar Symb      -- типовой атом
-          | Type :-> Type  -- стрелочный тип
-          | Type :^: Type   -- пересечение
+data Type = TVar Symb       -- type atom
+          | Type :-> Type   
+          | Type :^: Type   
     deriving (Read,Show,Eq,Ord)
 
 
-type Ctx = [Type] -- контекст
+type Ctx = [Type] -- context
 
 
 data MultiTNF = Meta
@@ -85,14 +87,15 @@ isArrow (_ :-> _) = True
 isArrow _ = False
 
 
+-- TODO: PROVE IT!
 (<:) :: Type -> Type -> Bool
-TVar a <: TVar b = a == b
-a <: b
-  | (sA :-> tA) <- a,
-    (sB :-> tB) <- b  = (tA <: tB) && (sB <: sA)
-  | otherwise         = all (\t -> any (<:t) a') b' where  -- for all t in b' thers's an s <: t in a'. 
-      a' = removeIntersection a
-      b' = removeIntersection b
+TVar a      <: TVar b      = a == b
+TVar _      <: (_ :-> _)   = False 
+(_ :-> _)   <: TVar _      = False 
+(sA :-> tA) <: (sB :-> tB) = (tA <: tB) && (sB <: sA)
+a           <: b           = all (\t -> any (<:t) a') b' where  -- for all t in b' thers's an s <: t in a'. 
+                                a' = removeIntersection a
+                                b' = removeIntersection b
 
 
 unMeta :: [Ctx] -> MultiTNF -> [MultiTNF]
@@ -129,9 +132,10 @@ unMeta ctxts (Meta ts) = do
 
   let expandedCandHead = uncurry2List candHead -- expand the head
 
-  (w, headArgs) <- expandedCandHead            -- choose non-determenistically head of the head =)        
+  (w, headArgs) <- expandedCandHead            -- choose non-determenistically head of the head =)     !!!!!!!   
   
   guard $ w == v                               -- check if it's a variable we are looking for
+
 
   let k = length headArgs
 
@@ -146,9 +150,7 @@ unMeta ctxts (Meta ts) = do
       guard $ length subtHeadArgs >= k && ((curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
       return $ take k subtHeadArgs
 
-
-
-  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) -- TODO: FIX TYPE ORDER IN ABSTRACTORS
+  return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) 
 
 
 

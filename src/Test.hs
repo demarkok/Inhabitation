@@ -3,6 +3,7 @@ import Inhabitation
 import Control.Monad.Writer 
 import Data.Complex
 
+tA = TVar "a"
 tArr = TVar "a" :-> TVar "a"
 tArrAB = TVar "a" :-> TVar "b"
 
@@ -46,6 +47,11 @@ exp_type n = foldl1 (:^:) (τ <$> [1..n]) where
 
 test8 = inhabs $ exp_type 3
 
+test9 = inhabs $ (tA :^: tArr) :-> tA
+
+test10 = inhabs $ tArr :^: (tArr :-> tArr)
+
+test11 = inhabs $ (TVar "a" :-> (TVar "b" :^: TVar "c")) :-> TVar "a" :-> TVar "c"
 
 inCurryStyle :: MultiTNF -> String
 inCurryStyle (MultiTNF abstractors h applicands)
