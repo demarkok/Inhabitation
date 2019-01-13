@@ -4,7 +4,7 @@ import Control.Arrow (second)
 import Control.Monad (guard)
 import Data.List (unfoldr, transpose)
 
--- import Debug.Trace
+import Debug.Trace
 
 type Symb = String 
 
@@ -78,10 +78,6 @@ curryFromList :: (Symb, [Type]) -> Type
 curryFromList (h, rest) = foldr (:->) (TVar h) rest
 
 
-curryFromRevList :: (Symb, [Type]) -> Type
-curryFromRevList (h, rest) = curryFromList (h, reverse rest)
-
-
 isArrow :: Type -> Bool
 isArrow (_ :-> _) = True
 isArrow _ = False
@@ -137,7 +133,9 @@ unMeta ctxts (Meta ts) = do
   guard $ w == v                               -- check if it's a variable we are looking for
 
 
+
   let k = length headArgs
+
 
   -- now we should check if the candHeadInd can produce other `types to inhabit` (from ts''') in other contexts (palettes)
   -- by "producing" we mean that the head takes minArgLen arguments and returns a subtype of the `type to inhabit`
@@ -147,8 +145,10 @@ unMeta ctxts (Meta ts) = do
     let expandedHeadToCheck = uncurry2List $ subtaskPalette !! candHeadInd
     return $ do 
       (subtW, subtHeadArgs) <- expandedHeadToCheck
-      guard $ length subtHeadArgs >= k && ((curryFromRevList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
+      -- trace (show ((curryFromRevList (subtW, drop k subtHeadArgs)))) [()]
+      guard $ length subtHeadArgs >= k && ((curryFromList (subtW, drop k subtHeadArgs)) <: (curryFromList subtaskType))
       return $ take k subtHeadArgs
+
 
   return $ MultiTNF abstractors candHeadInd (Meta <$> transpose tails) 
 

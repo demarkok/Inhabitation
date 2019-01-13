@@ -53,9 +53,24 @@ test10 = inhabs $ tArr :^: (tArr :-> tArr)
 
 test11 = inhabs $ (TVar "a" :-> (TVar "b" :^: TVar "c")) :-> TVar "a" :-> TVar "c"
 
+test12 = inhabs $ α:^:β :-> γ:^:δ :-> c :-> one where
+    [a, b, c, one, two] = TVar <$> ["a", "b", "c", "1", "2"]
+    α = ((a :-> a) :-> one) :^: ((b :-> a) :-> two) :-> one
+    β = ((a :-> b) :-> one) :^: ((b :-> b) :-> two) :-> two
+    γ = ((c :-> a) :-> a) :-> one
+    δ = ((c :-> b) :-> a) :-> two
+
+test13 = inhabs $ (TVar "a" :-> TVar "a") :^: ((TVar "a" :-> TVar "b") :-> (TVar "a" :-> TVar "b"))
+
+test14 = inhabs $ (TVar "d" :^: (TVar "a" :-> TVar "e2" :^: (TVar "b" :-> TVar "e3" :^: TVar "c"))) :-> (TVar "d" :^: (TVar "a" :-> TVar "b" :-> TVar "c"))
+
+test15 = inhabs $ (TVar "d" :^: (TVar "a" :-> (TVar "b" :^: TVar "c"))) :->  (TVar "d" :^: (TVar "a" :-> TVar "c"))
+
+
+
 inCurryStyle :: MultiTNF -> String
 inCurryStyle (MultiTNF abstractors h applicands)
-    | null $ abstractors !! 0 = (shows h) . (showApp applicands) $ ""
+    | null $ abstractors !! 0 = beginPar . (shows h) . (showApp applicands) . endPar $ ""
     | otherwise = 
         (showString "{") . 
         (shows $ length $ (abstractors !! 0)) .
@@ -65,4 +80,5 @@ inCurryStyle (MultiTNF abstractors h applicands)
         (showApp applicands) .
         (showString ")") $ 
         ""  where
+        [beginPar, endPar] = if (null applicands) then [id, id] else showString <$> ["(", ")"]
         showApp l = foldr (.) id $ (showString . showString " ") <$> inCurryStyle <$> applicands
