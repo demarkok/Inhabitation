@@ -12,7 +12,6 @@ infixr 3 :->  -- type arrow
 infixl 4 :^:  -- type intersection
 infix  1 <:    -- subtyping     p <: q   <=>    x:p |- x:q
 
-
 data Type = TVar Symb       -- type atom
           | Type :-> Type   
           | Type :^: Type   
@@ -55,27 +54,12 @@ uncurry2List t = do
   return (resultingHead, arrowTail ++ nearestTail)
 
 
--- a -> b -> c          |-->    (c, [b, a])
-uncurryArrow2RevList :: Type -> (Type, [Type])
-uncurryArrow2RevList = uncurryArrow2RevList' [] where
-  uncurryArrow2RevList' :: [Type] -> Type -> (Type, [Type])
-  uncurryArrow2RevList' res atom@(TVar _) = (atom, res)
-  uncurryArrow2RevList' res inter@(_ :^: _) = (inter, res) 
-  uncurryArrow2RevList' res (t1 :-> t2) = uncurryArrow2RevList' (t1 : res) t2
-
-
--- a -> b -> (c ^ d)    |-->    [(c, [b, a]), (d, [b, a])]
-uncurry2RevList :: Type -> [(Symb, [Type])]
-uncurry2RevList atom@(TVar x) = [(x, [])] 
-uncurry2RevList t = do
-  t' <- removeIntersection t
-  let (arrowHead, arrowTail) = uncurryArrow2RevList t'
-  (resultingHead, nearestTail) <- removeIntersection arrowHead >>= uncurry2RevList
-  return (resultingHead, nearestTail ++ arrowTail)
-
-
 curryFromList :: (Symb, [Type]) -> Type
 curryFromList (h, rest) = foldr (:->) (TVar h) rest
+
+-- a -> b -> (c ^ d)    |-->    (a -> b -> c) ^ (a -> b -> d)
+translate :: Type -> Type
+translate = foldl1 (:^:) . map curryFromList . uncurry2List
 
 
 isArrow :: Type -> Bool
@@ -89,9 +73,9 @@ TVar a      <: TVar b      = a == b
 TVar _      <: (_ :-> _)   = False 
 (_ :-> _)   <: TVar _      = False 
 (sA :-> tA) <: (sB :-> tB) = (tA <: tB) && (sB <: sA)
-a           <: b           = all (\t -> any (<:t) a') b' where  -- for all t in b' thers's an s <: t in a'. 
-                                a' = removeIntersection a
-                                b' = removeIntersection b
+a           <: b           = all (\t -> any (<:t) a') b' where  -- for all t in b' there's an s <: t in a'. 
+                                a' = removeIntersection $ translate a
+                                b' = removeIntersection $ translate b
 
 
 unMeta :: [Ctx] -> MultiTNF -> [MultiTNF]

@@ -7,6 +7,11 @@ tA = TVar "a"
 tArr = TVar "a" :-> TVar "a"
 tArrAB = TVar "a" :-> TVar "b"
 
+-- tArrAB = TVar "a" :-> TVar "b"
+tArrAC = TVar "a" :-> TVar "c"
+tArrABC = (TVar "a" :-> TVar "b" :^: TVar "c")
+
+
 tNat = tArr :-> tArr
 
 tBool = TVar "a" :-> TVar "a" :-> TVar "a"
@@ -66,7 +71,9 @@ test14 = inhabs $ (TVar "d" :^: (TVar "a" :-> TVar "e2" :^: (TVar "b" :-> TVar "
 
 test15 = inhabs $ (TVar "d" :^: (TVar "a" :-> (TVar "b" :^: TVar "c"))) :->  (TVar "d" :^: (TVar "a" :-> TVar "c"))
 
-
+test16 = inhabs $ ((((p :-> q) :-> p) :-> p) :-> q) :-> q where
+    p = TVar "p"
+    q = TVar "q"
 
 inCurryStyle :: MultiTNF -> String
 inCurryStyle (MultiTNF abstractors h applicands)
