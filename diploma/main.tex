@@ -188,7 +188,11 @@ $\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamm
 
 Далее будем считать, что надтипы и подтипы могут использоваться везде, где могут использоваться типы. При этом операции над типами <<поднимаются>> на уровень множеств. Так, например, выражение $\alpha \to \ob{\beta} \to \ub{\gamma}$ следует понимать как множество $\{ \alpha \to \beta' \to \gamma' \mid \beta' \in \ob{\beta}, \gamma' \in \ub{\gamma} \}$.
 
-Утверждения о типизации, в которых фигурируют надтипы и подтипы, следует считать истинным, если оно истинно {\it для некоторых} элементов соответствующих можеств надтипов и подтипов.
+Утверждение о типизации, в котором фигурируют надтипы или подтипы, будем считать выводимым, если оно выводимо {\it для некоторых} элементов соответствующих можеств надтипов и подтипов.
+
+Запись о вхождении типизации в контекст $(x \colon T) \in \Gamma$ в случае, если в $T$ фигурируют надтипы или подтипы, означает, что $(x \colon \tau) \in \Gamma$ {\it для некоторого} $\tau \in T$.
+
+Запись вида $T_1 \leqslant T_2$, где в $T_i$ могут фигурировать подтипы и надтипы, означает, что $\forall \tau_1 \in T_1, \tau_2 \in T_2 : \tau_1 \leqslant \tau_2$.
 
 \begin{lemma} \label{подтип стрелки}
 Пусть $\sigma \to \tau$ -- тип в нормальной форме. Тогда
@@ -217,7 +221,7 @@ $\ub{\sigma \to \tau} = \varphi \wedge (\ob{\sigma} \to \ub{\tau})$,
 \end{lemma}
 
 \begin{proof}
-Докажем истинность в системе $\lambda_\wedge_\leqslant$:
+Докажем выводимость в системе $\lambda_\wedge_\leqslant$:
 
 $$\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta}
         {\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta \wedge \gamma} &
