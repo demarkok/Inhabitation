@@ -1,0 +1,216 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+Система типов $\lambda_\wedge_\eta$ отличается от просто типизированного лямбда исчисления новым типовым конструктором: $\wedge$, соответствующим пересечению типов. Эту операцию можно понимать в теоретико-множественном смысле: типом $\sigma \wedge \tau$ типизируются такие и только такие термы, которые типизируются и $\sigma$, и $\tau$. Правила вывода, соответствующие этому поведению, обозначаются $(I\wedge)$ и $(E\wedge)$ (введение пересечения и элиминация пересечения соответственно). 
+
+Кроме того, вводится ещё одно дополнительное правило $(\eta)$, позволяющее проводить эта-экспансию. 
+
+Таким образом, система состоит из следующих правил вывода: $Ax$, $I\to$, $E\to$, $I\wedge$, $E\wedge$, $\eta$.
+\begin{equation} \label{rules eta}
+\begin{aligned}
+\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
+\infer[(E\wedge)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash M \colon \sigma \wedge \tau}\\[2pt]
+\infer[(\eta)]{\Gamma \vdash (\lambda x . M x) \colon \sigma}{\Gamma \vdash M \colon \sigma}
+
+\end{aligned}
+\end{equation}
+
+\subsection{Подтипизация}
+
+
+Определим на типах отношение подтипизации. С теоретико-множественной точки зрения подтпизация соответствует отношению <<быть подмножеством>>: если терм типизируется $\sigma$, то он типизируется всеми надтипами $\sigma$, то есть такими $\tau$, что $\sigma \leqslant \tau$. Отношение определим следующими аксиомами и правилами, аналогично определению из \cite{hindley_82}.
+
+\begin{equation} \label{rules leq}
+\begin{aligned}
+\infer[(A1)]{\sigma \leqslant \sigma}{} \\[2pt]
+\infer[(A2)]{\sigma \leqslant \sigma \wedge \sigma}{} \\[2pt]
+\infer[(A3)]{\sigma \wedge \tau \leqslant \sigma}{} \\[2pt]
+\infer[(A4)]{\sigma \wedge \tau \leqslant \tau}{} \\[2pt]
+\infer[(A5)]{(\sigma \to \tau_1) \wedge (\sigma \to \tau_2) \leqslant \sigma \to (\tau_1 \wedge \tau_2)}{} \\[2pt]
+\infer[(R1)]{\sigma \wedge \tau \leqslant \sigma' \wedge \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
+\infer[(R2)]{\sigma' \to \tau \leqslant \sigma \to \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
+\infer[(R3)]{\tau_1 \leqslant \tau_3}{\tau_1 \leqslant \tau_2 & \tau_2 \leqslant \tau_3} 
+\end{aligned}
+\end{equation}
+
+
+В \cite{hindley_92} показано, что правило $(\eta)$ может быть заменено следующим правилом:
+
+$$\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}$$
+
+На самом деле, поскольку $\sigma \wedge \tau \leqslant \sigma$ и $\sigma \wedge \tau \leqslant \tau$, правило $(E \wedge)$ также избыточно. Таким образом, правила в этой системе следующие: 
+
+\begin{equation} \label{rules subtype}
+\begin{aligned}
+\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
+\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}
+
+\end{aligned}
+\end{equation}
+
+Полученную систему будем называть $\lambda_{\wedge \leqslant}$. Она эквивалентна $\lambda_\wedge_\eta$ в смысле типизации: утверждение типизации, верное в системе  $\lambda_{\wedge \leqslant}$, верно в $\lambda_\wedge_\eta$ и наоборот. Поэтому в контексте нашей задачи эти две системы полностью взаимозаменяемы.
+
+Определим отношение эквивалентности на типах следующим образом. 
+
+\begin{definition}
+$\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
+\end{definition}
+
+Благодаря правилу $(\leqslant)$, для эквивалентных типов верно следующее утверждение:
+
+\begin{lemma}
+Множества термов, тпизируемых эквивалентными типами, в точности совпадают.
+\end{lemma}
+
+В частности, это означает, что переход к эквивалентному типу не влияет на его обитаемость.
+
+Легко видеть, что отношение <<$\sim$>> является отношением конгруэнтности (в смысле \cite{barendregt_93}) а именно, верна следующая Лемма:
+\begin{lemma}
+Пусть $\alpha, \beta, \gamma, \delta$ -- типы. 
+Если $\alpha \sim \beta$ и $\gamma \sim \delta$, то $(\alpha \to \gamma) \sim (\beta \to \delta)$, а также $(\alpha \wedge \gamma) \sim (\beta \wedge \delta)$.
+\end{lemma}
+
+
+
+Для удобства введём следующее обозначение: 
+\begin{definition}
+\begin{align*}
+\hat{\tau} = \{\tau_i \mid & \tau_1 \wedge \dots \wedge \tau_k = \tau \\
+                               && \text{и $\tau_i$ не является пересечением ни для какого i} \}
+\end{align*}
+То есть $\hat{\tau}$ -- множество, полученное разделением всех пересечений на верхнем уровне $\tau$.
+\end{definition}
+
+
+В \cite{hindley_82} показана следующая экивалентность: 
+\begin{lemma}
+$\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamma)$
+\end{lemma}
+
+Применяя её многократно, мы можем привести тип к нормальной форме. А именно, введём операцию <<*>> следующим образом: 
+
+\begin{definition}
+\begin{align*}
+\alpha^* &= \alpha \\
+    &\text{если $\alpha$ --- типовая переменная }\\
+(\sigma \wedge \tau)^* &= \sigma^* \wedge \tau^*\\
+(\sigma \to \tau)^* &= \bigwedge \limits_{\varphi \in \hat{\tau^*}} \sigma \to \varphi
+\end{align*}
+\end{definition}
+
+Например, $(\alpha \to \gamma \wedge (\beta \to \gamma \wedge \delta))^* = (\alpha \to \beta \to \gamma) \wedge (\alpha \to \beta \to \delta) \wedge (\alpha \to \gamma)$.
+
+Операция <<*>> переводит тип в эквивалентный.
+
+\begin{lemma} \label{normal form}
+Для любого типа $\tau$: $\tau \sim \tau^*$
+\end{lemma}
+
+
+\begin{definition}
+Тип $\tau$ находится в {\it нормальной форме}, если $\tau^* = \tau$.
+\end{definition}
+
+Общий вид типа в нормальной форме после применения <<*>> описывается следующей леммой:
+
+\begin{lemma}
+Для любого типа $\tau$: $\tau^* = \bigwedge \limits_i (\varphi_i_1 \to \cdots \to \varphi_i_{k_i} \to \alpha_i$), где $\alpha_i$ - типовая переменная.
+\end{lemma}
+
+\begin{corollary} \label{normal form unit}
+Типы в нормальной форме без пересечений на верхнем уровне --- в точности типы вида $\dots \to \alpha$, где $\alpha$ -- некоторая типовая переменная.
+\end{corollary}
+
+В \cite{hindley_82} показано, что отношение $(\leqslant)$ рекурсивно и существует алгоритм, позволяющий определить для двух типов $\alpha$ и $\beta$ верно ли, что $\alpha \leqslant \beta$:
+
+
+\begin{algorithm} \label{subt algo}
+\begin{align*}
+    \alpha &\leqslant \beta  = (\alpha \ttt{ == } \beta) \\ 
+                            &\text{если $\alpha$ и $\beta$ --- типовые переменные} \\
+    \sigma &\leqslant \tau = False \\ 
+                          &\text{если один из типов --- переменная, а другой тип стрелочный}\\
+    (\sigma_1 \to \tau_1) &\leqslant (\sigma_2 \to \tau_2) = (\tau_1 \leqslant \tau_2) \ttt{ AND } (\sigma_2  \leqslant \sigma_1) \\
+    \sigma &\leqslant \tau = \forall \tau_i \in \hat{\tau^*} \colon \exists \sigma_j \in \hat{\sigma^*} \colon \sigma_j \leqslant \tau_i
+\end{align*}
+\end{algorithm}
+
+Введём ещё несколько обозначений. 
+
+\begin{definition}
+Обозначим множество всех подтипов $\tau$ через $\ub{\tau}$, а множество всех его надтипов через $\ob{\tau}$. То есть $\ub{\tau} = \{ \sigma \mid \sigma \leqslant \tau \}$, $\ob{\tau} =  \{ \sigma \mid \tau \leqslant \sigma \}$. 
+\end{definition}
+
+Далее будем считать, что надтипы и подтипы могут использоваться везде, где могут использоваться типы. При этом операции над типами <<поднимаются>> на уровень множеств. Так, например, выражение $\alpha \to \ob{\beta} \to \ub{\gamma}$ следует понимать как множество $\{ \alpha \to \beta' \to \gamma' \mid \beta' \in \ob{\beta}, \gamma' \in \ub{\gamma} \}$.
+
+Утверждение о типизации, в котором фигурируют надтипы или подтипы, будем считать выводимым, если оно выводимо {\it для некоторых} элементов соответствующих можеств надтипов и подтипов.
+
+Запись о вхождении типизации в контекст $(x \colon T) \in \Gamma$ в случае, если в $T$ фигурируют надтипы или подтипы, означает, что $(x \colon \tau) \in \Gamma$ {\it для некоторого} $\tau \in T$.
+
+Запись вида $T_1 \leqslant T_2$, где в $T_i$ могут фигурировать подтипы и надтипы, означает, что $\forall \tau_1 \in T_1, \tau_2 \in T_2 : \tau_1 \leqslant \tau_2$.
+
+\begin{lemma} \label{подтип стрелки}
+Пусть $\sigma \to \tau$ -- тип в нормальной форме. Тогда
+$\ub{\sigma \to \tau} = \varphi \wedge (\ob{\sigma} \to \ub{\tau})$,
+для некоторого (возможно, пустого) $\varphi$.
+
+\end{lemma}
+
+\begin{proof}
+    Включение $\varphi \wedge (\ob{\sigma} \to \ub{\tau}) \subseteq \ub{\sigma \to \tau}$ почти очевидно: 
+    $$\infer[(A4)]{\varphi \wedge (\ob{\sigma} \to \ub{\tau}) \leqslant \sigma \to \tau}
+                  {\infer[(R2)]{\ob{\sigma} \to \ub{\tau}}
+                               {\sigma \leqslant \ob{\sigma} & \ub{\tau} \leqslant \tau}}$$
+                               
+    Для включения $\ub{\sigma \to \tau} \subseteq \varphi \wedge (\ob{\sigma} \to \ub{\tau})$ достаточно посмотреть на Алгоритм~\ref{subt algo}. Подтип $\sigma \to \tau$ --- это либо тип из $(\ob{\sigma} \to \ub{\tau})$ (третий случай алгоритма), либо тип-пересечение, один из элементов которого --- подтип $\sigma \to \tau$; остальные элементы можно <<переместить>> в $\varphi$ перестановкой.
+\end{proof}
+
+
+\subsection{Существенность $\eta$ правила}
+
+Насколько добавление $\eta$ - правило меняет систему? 
+Система $\lambda_\wedge$ существенно слабее $\lambda_\wedge_\eta$, а именно, есть тип, необитаемый в системе без эта-правила и обитаемый в системе с ним. 
+
+\begin{lemma} \label{существенность: типизация}
+Утверждение о типизации $x : \alpha \to \beta \wedge \gamma \vdash x : \alpha \to \beta$ верно в $\lambda_{\wedge \eta}$ но неверно в $\lambda_{\wedge}$.
+\end{lemma}
+
+\begin{proof}
+Докажем выводимость в системе $\lambda_{\wedge \leqslant}$:
+
+$$\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta}
+        {\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta \wedge \gamma} &
+            \alpha \to \beta \wedge \gamma \leqslant \alpha \to \beta}
+         $$ 
+Чтобы доказать, что утверждение неверно в системе $\lambda_{\wedge}$, предположим обратное. Рассмотрим последнее правило вывода, которое могло быть применено, чтобы получить данное утверждение. $(I \to)$ и $(E \to)$ не могли быть применены, поскольку они типизируют абстракцию и аппликацию соответственно, а $x$ --- типовая переменная. Правило $(Ax)$ требует наличия соответствующей типизации в контексте, правило $(I \wedge)$ приписывает терму тип-пересечение, а не стрелочный тип.
+
+Таким образом, единственным возможным правилом могло быть $(E \wedge)$:
+
+$$\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta}
+        {\infer*{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon (\alpha \to \beta) \wedge \sigma}}
+$$ 
+Какие правила вывода могли привести к данному утверждению о типизации? Только $(I\to)$ и $(E\to)$. Однако легко видеть, что их <<обратное>> применение порождает утверждение вида $x \colon \alpha \to \beta \wedge \gamma \vdash x \colon (\alpha \to \beta) \wedge \sigma$ для некоторого (возможно, пустого) $\sigma$, но утверждение такого вида уже встречалось ранее, и могло быть получено лишь с помощью $(I\to)$ и $(E\to)$. Значит, дерева вывода не существует.
+
+\end{proof}
+
+\begin{lemma}
+Тип $\delta \wedge (\alpha \to \beta \wedge \gamma) \to \delta \wedge (\alpha \to \beta)$ пуст в $\lambda_{\wedge}$, но содержит терм \ttt{id} в $\lambda_{\wedge \eta}$. 
+\end{lemma}
+
+\begin{proof}
+
+Анализом возможных деревьев вывода, аналогичным рассуждениям в предыдущей лемме, получаем, что для существования типизации $\vdash M \colon \delta \wedge (\alpha \to \beta \wedge \gamma) \to \delta \wedge (\alpha \to \beta)$ необходима и достаточна типизация $x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta$. 
+
+\end{proof}
+
+\begin{notice}
+    Тип  $(\alpha \to \beta \wedge \gamma) \to \alpha \to \beta$ обитаем в обеих системах. В $\lambda_{\wedge}$ он содержит $\lambda a b . a b$, но не $\lambda a . a$.
+\end{notice}
+
+\end{document}

@@ -322,6 +322,7 @@
 
 
 \usepackage{amsmath}
+\usepackage{subfiles}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
