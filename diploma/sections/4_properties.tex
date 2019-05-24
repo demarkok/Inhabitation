@@ -3,7 +3,7 @@
 
 
 
-В этом разделе будут доказаны свойства Алгоритма \ref{alg} для системы $\lambda_\wedge_\eta$. А именно, его корректность (soundness), полнота (completeness), завершаемость (termination) на типах ранга $\leqslant 2$.
+В этом разделе будут доказаны свойства Алгоритма \ref{alg} для системы $\lambda_{\wedge \eta}$. А именно, его корректность (soundness), полнота (completeness), завершаемость (termination) на типах ранга $\leqslant 2$.
 
 
 \subsection{Корректность}
@@ -33,8 +33,8 @@
 \begin{proof}
     Докажем равносильность в обе стороны.
 \begin{itemize}
-    \item [\Leftarrow )] применяя правило $(E\to)$ $k$ раз, получаем в точности необходимое утверждение о типизации.
-    \item [\Rightarrow )] Если $k = 0$, то утверждение леммы очевидно. Иначе докажем индукцией по размеру дерева вывода (анализируя дерево с конца, аналогично доказательству Леммы \ref{существенность: типизация}). Рассуждения будет удобнее провести в системе $\lambda_{\wedge \leqslant}$~(\ref{rules subtype}), поскольку в ней меньше правил вывода.
+    \item [$\Leftarrow$ )] применяя правило $(E\to)$ $k$ раз, получаем в точности необходимое утверждение о типизации.
+    \item [$\Rightarrow$ )] Если $k = 0$, то утверждение леммы очевидно. Иначе докажем индукцией по размеру дерева вывода (анализируя дерево с конца, аналогично доказательству Леммы \ref{существенность: типизация}). Рассуждения будет удобнее провести в системе $\lambda_{\wedge \leqslant}$~(\ref{rules subtype}), поскольку в ней меньше правил вывода.
     
     
     Какое правило вывода могло быть применено последним, чтобы получить утверждение $\Gamma \vdash x M_1 \dots M_k \colon \tau$? Это не могло быть $(Ax)$, так как оно типизирует переменную; это не могло быть $(I \to)$, так как оно типизирует лямбда абстракцию; это не могло быть $(I \wedge)$, поскольку в $\tau$ нет пересечений на верхнем уровне. Таким образом, могли быть применены только два правила: $(\leqslant)$ или $(E \to)$. 
@@ -44,8 +44,7 @@
     Таким образом, в общем случае дерево вывода имеет следующий вид: 
     $$\infer*[(\leqslant), (I \wedge)]{\Gamma \vdash x M_1 \dots M_k \colon \tau}
                           {\infer[(E \to)]{\Gamma \vdash x M_1 \dots M_k \colon \ub{\tau}}
-                                                {\infer*{\Gamma \vdash x M_1 \dots M_{k - 1} \colon \alpha_k \to \ub{\tau}}{} &
-                                                 \infer*{\Gamma \vdash M_k \colon \alpha_k}}{}}$$
+                          {\infer*{\Gamma \vdash x M_1 \dots M_{k - 1} \colon \alpha_k \to \ub{\tau}}{} & \infer*{\Gamma \vdash M_k \colon \alpha_k}}{}}$$
     Поскольку $\alpha_k \to \ub{\tau} \leqslant \alpha_k \to \tau$, верно утверждение о типизации $\Gamma \vdash x M_1 \dots M_{k - 1} \colon \alpha_k \to \tau$, которое подходит под условия леммы. Поэтому, применив те же рассуждения ещё $k - 1$ раз, получим $\Gamma \vdash x \colon \alpha_1 \to \ub{\alpha_2 \to \cdots \to \alpha_k \to \tau}$, а также $\Gamma \vdash M_i \colon \alpha_i \text{ для } i = 1 \dots k$. 
     
     Легко видеть, что $\alpha_1 \to \ub{\alpha_2 \to \cdots \to \alpha_k \to \tau} \leqslant \alpha_1 \to \cdots \to \alpha_k \to \tau$, поэтому мы можем применить $(\leqslant)$ и получить необходимую типизацию.
