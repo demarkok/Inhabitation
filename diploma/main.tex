@@ -1,0 +1,467 @@
+% В этом шаблоне используется класс spbau-diploma. Его можно найти и, если требуется, 
+% поправить в файле spbau-diploma.cls
+\documentclass{spbau-diploma}
+\begin{document}
+% Год, город, название университета и факультета предопределены,
+% но можно и поменять.
+% Если англоязычная титульная страница не нужна, то ее можно просто удалить.
+\filltitle{ru}{
+    % chair              = {Кафедра математических и информационных технологий},
+    title              = {Задача обитаемости в системах типов низкого ранга},
+    % Здесь указывается тип работы. Возможные значения:
+    %   coursework - Курсовая работа
+    %   diploma - Диплом специалиста
+    %   master - Диплом магистра
+    %   bachelor - Диплом бакалавра
+    type               = {bachelor},
+    position           = {студента},
+    group              = 666,
+    author             = {Кайсин Илья Сергеевич},
+    supervisorPosition = {к.\,ф.-м.\,н., профессор},
+    supervisor         = {Москвин Д.\,Н.},
+    reviewerPosition   = {},
+    reviewer           = {Пеленицын А.\,М},
+    chairHeadPosition  = {д.\,ф.-м.\,н., профессор},
+    chairHead          = {Омельченко А.\,В.},
+    % university = {САНКТ-ПЕТЕРБУРГСКИЙ АКАДЕМИЧЕСКИЙ УНИВЕРСИТЕТ},
+    % faculty = {Центр высшего образования},
+    % city = {Санкт-Петербург},
+    % year             = {2013}
+}
+
+
+\maketitle
+\tableofcontents
+% У введения нет номера главы
+% \section*{Введение},
+% Введение
+
+% \section*{Обзор литературы}
+
+\section{Система типов $\lambda_\wedge_\eta$}
+
+Система типов $\lambda_\wedge_\eta$ отличается от просто типизированного лямбда исчисления новым типовым конструктором: $\wedge$, соответствующим пересечению типов. Эту операцию можно понимать в теоретико-множественном смысле: типом $\sigma \wedge \tau$ типизируются такие и только такие термы, которые типизируются и $\sigma$, и $\tau$. Правила вывода, соответствующие этому поведению, обозначаются $(I\wedge)$ и $(E\wedge)$ (введение пересечения и элиминация пересечения соответственно). 
+
+Кроме того, вводится ещё одно дополнительное правило $(\eta)$, позволяющее проводить эта-экспансию. 
+
+Таким образом, система состоит из следующих правил вывода: $Ax$, $I\to$, $E\to$, $I\wedge$, $E\wedge$, $\eta$.
+\begin{equation} \label{rules eta}
+\begin{aligned}
+\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
+\infer[(E\wedge)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash M \colon \sigma \wedge \tau}\\[2pt]
+\infer[(\eta)]{\Gamma \vdash (\lambda x . M x) \colon \sigma}{\Gamma \vdash M \colon \sigma}
+
+\end{aligned}
+\end{equation}
+
+\subsection{Подтипизация}
+
+
+Определим на типах отношение подтипизации. С теоретико-множественной точки зрения подтпизация соответствует отношению <<быть подмножеством>>: если терм типизируется $\sigma$, то он типизируется всеми надтипами $\sigma$, то есть такими $\tau$, что $\sigma \leqslant \tau$. Отношение определим следующими аксиомами и правилами, аналогично определению из \cite{hindley_82}.
+
+\begin{equation} \label{rules leq}
+\begin{aligned}
+\infer[(A1)]{\sigma \leqslant \sigma}{} \\[2pt]
+\infer[(A2)]{\sigma \leqslant \sigma \wedge \sigma}{} \\[2pt]
+\infer[(A3)]{\sigma \wedge \tau \leqslant \sigma}{} \\[2pt]
+\infer[(A4)]{\sigma \wedge \tau \leqslant \tau}{} \\[2pt]
+\infer[(A5)]{(\sigma \to \tau_1) \wedge (\sigma \to \tau_2) \leqslant \sigma \to (\tau_1 \wedge \tau_2)}{} \\[2pt]
+\infer[(R1)]{\sigma \wedge \tau \leqslant \sigma' \wedge \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
+\infer[(R2)]{\sigma' \to \tau \leqslant \sigma \to \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
+\infer[(R3)]{\tau_1 \leqslant \tau_3}{\tau_1 \leqslant \tau_2 & \tau_2 \leqslant \tau_3} 
+\end{aligned}
+\end{equation}
+
+
+В \cite{hindley_92} показано, что правило $(\eta)$ может быть заменено следующим правилом:
+
+$$\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}$$
+
+На самом деле, поскольку $\sigma \wedge \tau \leqslant \sigma$ и $\sigma \wedge \tau \leqslant \tau$, правило $(E \wedge)$ также избыточно. Таким образом, правила в этой системе следующие: 
+
+\begin{equation} \label{rules subtype}
+\begin{aligned}
+\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
+\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}
+
+\end{aligned}
+\end{equation}
+
+Полученную систему будем называть $\lambda_\wedge_\leqslant$. Она эквивалентна $\lambda_\wedge_\eta$ в смысле типизации: утверждение типизации, верное в системе  $\lambda_\wedge_\leqslant$, верно в $\lambda_\wedge_\eta$ и наоборот. Поэтому в контексте нашей задачи эти две системы полностью взаимозаменяемы.
+
+Определим отношение эквивалентности на типах следующим образом. 
+
+\begin{definition}
+$\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
+\end{definition}
+
+Благодаря правилу $(\leqslant)$, для эквивалентных типов верно следующее утверждение:
+
+\begin{lemma}
+Множества термов, тпизируемых эквивалентными типами, в точности совпадают.
+\end{lemma}
+
+В частности, это означает, что переход к эквивалентному типу не влияет на его обитаемость.
+
+Легко видеть, что отношение <<$\sim$>> является отношением конгруэнтности (в смысле \cite{barendregt_93}) а именно, верна следующая Лемма:
+\begin{lemma}
+Пусть $\alpha, \beta, \gamma, \delta$ -- типы. 
+Если $\alpha \sim \beta$ и $\gamma \sim \delta$, то $(\alpha \to \gamma) \sim (\beta \to \delta)$, а также $(\alpha \wedge \gamma) \sim (\beta \wedge \delta)$.
+\end{lemma}
+
+
+
+Для удобства введём следующее обозначение: 
+\begin{definition}
+\begin{align*}
+\hat{\tau} = \{\tau_i \mid & \tau_1 \wedge \dots \wedge \tau_k = \tau \\
+                               && \text{и $\tau_i$ не является пересечением ни для какого i} \}
+\end{align*}
+То есть $\hat{\tau}$ -- множество, полученное разделением всех пересечений на верхнем уровне $\tau$.
+\end{definition}
+
+
+В \cite{hindley_82} показана следующая экивалентность: 
+\begin{lemma}
+$\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamma)$
+\end{lemma}
+
+Применяя её многократно, мы можем привести тип к нормальной форме. А именно, введём операцию <<*>> следующим образом: 
+
+\begin{definition}
+\begin{align*}
+\alpha^* &= \alpha \\
+    &\text{если $\alpha$ --- типовая переменная }\\
+(\sigma \wedge \tau)^* &= \sigma^* \wedge \tau^*\\
+(\sigma \to \tau)^* &= \bigwedge \limits_{\varphi \in \hat{\tau^*}} \sigma \to \varphi
+\end{align*}
+\end{definition}
+
+Например, $(\alpha \to \gamma \wedge (\beta \to \gamma \wedge \delta))^* = (\alpha \to \beta \to \gamma) \wedge (\alpha \to \beta \to \delta) \wedge (\alpha \to \gamma)$.
+
+Операция <<*>> переводит тип в эквивалентный.
+
+\begin{lemma} \label{normal form}
+Для любого типа $\tau$: $\tau \sim \tau^*$
+\end{lemma}
+
+
+\begin{definition}
+Тип $\tau$ находится в {\it нормальной форме}, если $\tau^* = \tau$.
+\end{definition}
+
+Общий вид типа в нормальной форме после применения <<*>> описывается следующей леммой:
+
+\begin{lemma}
+Для любого типа $\tau$: $\tau^* = \bigwedge \limits_i (\varphi_i_1 \to \cdots \to \varphi_i_{k_i} \to \alpha_i$), где $\alpha_i$ - типовая переменная.
+\end{lemma}
+
+\begin{corollary} \label{normal form unit}
+Типы в нормальной форме без пересечений на верхнем уровне --- в точности типы вида $\dots \to \alpha$, где $\alpha$ -- некоторая типовая переменная.
+\end{corollary}
+
+В \cite{hindley_82} показано, что отношение $(\leqslant)$ рекурсивно и существует алгоритм, позволяющий определить для двух типов $\alpha$ и $\beta$ верно ли, что $\alpha \leqslant \beta$:
+
+
+\begin{algorithm} \label{subt algo}
+\begin{align*}
+    \alpha &\leqslant \beta  = (\alpha \ttt{ == } \beta) \\ 
+                            &\text{если $\alpha$ и $\beta$ --- типовые переменные} \\
+    \sigma &\leqslant \tau = False \\ 
+                          &\text{если один из типов --- переменная, а другой тип стрелочный}\\
+    (\sigma_1 \to \tau_1) &\leqslant (\sigma_2 \to \tau_2) = (\tau_1 \leqslant \tau_2) \ttt{ AND } (\sigma_2  \leqslant \sigma_1) \\
+    \sigma &\leqslant \tau = \forall \tau_i \in \hat{\tau^*} \colon \exists \sigma_j \in \hat{\sigma^*} \colon \sigma_j \leqslant \tau_i
+\end{align*}
+\end{algorithm}
+
+Введём ещё несколько обозначений. 
+
+\begin{definition}
+Обозначим множество всех подтипов $\tau$ через $\ub{\tau}$, а множество всех его надтипов через $\ob{\tau}$. То есть $\ub{\tau} = \{ \sigma \mid \sigma \leqslant \tau \}$, $\ob{\tau} =  \{ \sigma \mid \tau \leqslant \sigma \}$. 
+\end{definition}
+
+Далее будем считать, что надтипы и подтипы могут использоваться везде, где могут использоваться типы. При этом операции над типами <<поднимаются>> на уровень множеств. Так, например, выражение $\alpha \to \ob{\beta} \to \ub{\gamma}$ следует понимать как множество $\{ \alpha \to \beta' \to \gamma' \mid \beta' \in \ob{\beta}, \gamma' \in \ub{\gamma} \}$.
+
+Утверждения о типизации, в которых фигурируют надтипы и подтипы, следует считать истинным, если оно истинно {\it для некоторых} элементов соответствующих можеств надтипов и подтипов.
+
+\begin{lemma} \label{подтип стрелки}
+Пусть $\sigma \to \tau$ -- тип в нормальной форме. Тогда
+$\ub{\sigma \to \tau} = \varphi \wedge (\ob{\sigma} \to \ub{\tau})$,
+для некоторого (возможно, пустого) $\varphi$.
+
+\end{lemma}
+
+\begin{proof}
+    Включение $\varphi \wedge (\ob{\sigma} \to \ub{\tau}) \subseteq \ub{\sigma \to \tau}$ почти очевидно: 
+    $$\infer[(A4)]{\varphi \wedge (\ob{\sigma} \to \ub{\tau}) \leqslant \sigma \to \tau}
+                  {\infer[(R2)]{\ob{\sigma} \to \ub{\tau}}
+                               {\sigma \leqslant \ob{\sigma} & \ub{\tau} \leqslant \tau}}$$
+                               
+    Для включения $\ub{\sigma \to \tau} \subseteq \varphi \wedge (\ob{\sigma} \to \ub{\tau})$ достаточно посмотреть на Алгоритм~\ref{subt algo}. Подтип $\sigma \to \tau$ --- это либо тип из $(\ob{\sigma} \to \ub{\tau})$ (третий случай алгоритма), либо тип-пересечение, один из элементов которого --- подтип $\sigma \to \tau$; остальные элементы можно <<переместить>> в $\varphi$ перестановкой.
+\end{proof}
+
+
+\subsection{Существенность $\eta$ правила}
+
+Насколько добавление $\eta$ - правило меняет систему? 
+Система $\lambda_\wedge$ существенно слабее $\lambda_\wedge_\eta$, а именно, есть тип, необитаемый в системе без эта-правила и обитаемый в системе с ним. 
+
+\begin{lemma} \label{существенность: типизация}
+Утверждение о типизации $x : \alpha \to \beta \wedge \gamma \vdash x : \alpha \to \beta$ верно в $\lambda_{\wedge \eta}$ но неверно в $\lambda_{\wedge}$.
+\end{lemma}
+
+\begin{proof}
+Докажем истинность в системе $\lambda_\wedge_\leqslant$:
+
+$$\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta}
+        {\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta \wedge \gamma} &
+            \alpha \to \beta \wedge \gamma \leqslant \alpha \to \beta}
+         $$ 
+Чтобы доказать, что утверждение неверно в системе $\lambda_{\wedge}$, предположим обратное. Рассмотрим последнее правило вывода, которое могло быть применено, чтобы получить данное утверждение. $(I \to)$ и $(E \to)$ не могли быть применены, поскольку они типизируют абстракцию и аппликацию соответственно, а $x$ --- типовая переменная. Правило $(Ax)$ требует наличия соответствующей типизации в контексте, правило $(I \wedge)$ приписывает терму тип-пересечение, а не стрелочный тип.
+
+Таким образом, единственным возможным правилом могло быть $(E \wedge)$:
+
+$$\infer{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta}
+        {\infer*{x \colon \alpha \to \beta \wedge \gamma \vdash x \colon (\alpha \to \beta) \wedge \sigma}}
+$$ 
+Какие правила вывода могли привести к данному утверждению о типизации? Только $(I\to)$ и $(E\to)$. Однако легко видеть, что их <<обратное>> применение порождает утверждение вида $x \colon \alpha \to \beta \wedge \gamma \vdash x \colon (\alpha \to \beta) \wedge \sigma$ для некоторого (возможно, пустого) $\sigma$, но утверждение такого вида уже встречалось ранее, и могло быть получено лишь с помощью $(I\to)$ и $(E\to)$. Значит, дерева вывода не существует.
+
+\end{proof}
+
+\begin{lemma}
+Тип $\delta \wedge (\alpha \to \beta \wedge \gamma) \to \delta \wedge (\alpha \to \beta)$ пуст в $\lambda_{\wedge}$, но содержит терм \ttt{id} в $\lambda_{\wedge \eta}$. 
+\end{lemma}
+
+\begin{proof}
+
+Анализом возможных деревьев вывода, аналогичным рассуждениям в предыдущей лемме, получаем, что для существования типизации $\vdash M \colon \delta \wedge (\alpha \to \beta \wedge \gamma) \to \delta \wedge (\alpha \to \beta)$ необходима и достаточна типизация $x \colon \alpha \to \beta \wedge \gamma \vdash x \colon \alpha \to \beta$. 
+
+\end{proof}
+
+\begin{notice}
+    Тип  $(\alpha \to \beta \wedge \gamma) \to \alpha \to \beta$ обитаем в обеих системах. В $\lambda_{\wedge}$ он содержит $\lambda a b . a b$, но не $\lambda a . a$.
+\end{notice}
+
+\section{Населяющий алгоритм}
+
+В \cite{kusmierek_07} был представлен населяющий алгоритм для системы $\lambda_\wedge$. Однако этот  алгоритм описан недостаточно полно, что выяснилось при его реализации. Кроме того, алгоритм и доказательство его корректности содержат ошибку. Данная работа устраняет эти неточности и ошибки. Алгоритм для $\lambda_\wedge_\leqslant$ является модификацией алгоритма из \cite{kusmierek_07}, поэтому сначала рассмотрим его (в исправленном варианте).
+
+
+\subsection{Населяющий алгоритм для $\lambda_\wedge$}
+
+\begin{algorithm} \label{алгоритм без эты}
+
+В процессе алгоритма решается система из нескольких задач: $[\Gamma_1 \vdash X : \tau_1 ,\dots, \Gamma_n \vdash X : \tau_n]$. Решением системы является терм $X$, удовлетворяющий всем утверждениям типизации одновременно. При этом поддерживается инвариант: все задачи системы имеют общий набор переменных в контексте (при этом одной и той же типовой переменной могут соответствовать разные типы в разных контекстах). Алгоритм заключается в применении следующих преобразований до тех пор, пока это возможно:
+\begin{itemize}
+    \item $1$. Один из типов $\tau_i$ -- пересечение ($\tau_i = \sigma \wedge \rho$). Тогда $i$-я задача $\Gamma_i \vdash X : \tau_i$ заменяется двумя:  $\Gamma_i \vdash X : \sigma$ и $\Gamma_i \vdash X : \rho$. Таким образом, размер системы увеличивается
+     \item $2$. Все типы $\tau_i$ стрелочные  ($\tau_i = \sigma_i \to \rho_i$, $i = 1 \dots n$). Тогда решение системы --  $X = \lambda x.X'$, где $X'$ -- решение новой системы  $[(\Gamma_1, x:\sigma_1 \vdash X' : \rho_1) ,\dots, (\Gamma_n, x:\sigma_n \vdash X' : \rho_n)]$. То есть в этом случае во всех типах редуцируется первый аргумент. 
+     \item $3_{\wedge}$. Один из типов $\tau_i$ -- это типовая переменная. Тогда $X$ не может быть абстракцией и должен быть (возможно пустой) аппликацией некоторой головной переменной, взятой из контекста, к термам. В этом случае необходимо недетерминированно выбрать из контекста головную переменную $x$ и число $k \geqslant 0$ таким образом, чтобы  $\Gamma_i \vdash \lambda z_1 \dots z_k . x z_1 \dots z_k : \rho_i^1 \to \dots \to \rho_i^k \to \tau_i$ для всех $i = 1 \dots n$. Тогда решение --  $X = x Z^1 \dots Z^k$, где  $Z^i$ -- решение системы $[(\Gamma_1 \vdash Z^i : \rho_1^i) ,\dots, (\Gamma_n \vdash Z^i : \rho_n^i)]$. Здесь $k$ систем независимы и могут быть решены параллельно.
+\end{itemize}
+
+Если ни одно из преобразований применить невозможно, то система не имеет решения. 
+<<Точка выхода>> из алгоритма -- тот случай в преобразовании 3, при котором $k = 0$, при этом решением является переменная.
+    
+\end{algorithm}
+
+
+В данном алгоритме не совсем ясным является шаг $3_{\wedge}$: как именно выбираются $\rho_i^j$. Типизация $\Gamma_i \vdash \lambda z_1 \dots z_k . x z_1 \dots z_k : \rho_i^1 \to \dots \to \rho_i^k \to \tau_i$ не гарантирует того, что тип $x$ в контексте $\Gamma_i$ обязан быть $ \rho_i^1 \to \dots \to \rho_i^k \to \tau_i$.
+
+\subsection{Населяющий алгоритм для $\lambda_\wedge_\eta$}
+
+Алгоритм для системы с $\eta$-правилом во многом повторяет алгоритм для $\lambda_\wedge$. Принципиальное отличие заключается в преобразовании $3$.
+\begin{algorithm} \label{alg} 
+Поддерживается система из нескольких задач: $\Gamma_1 \vdash X : \tau_1 ,\dots, \Gamma_n \vdash X : \tau_n$. До тех пор, пока это возможно, выполняется один из четырёх шагов: 
+
+\begin{itemize}
+
+     \item $0$. Один из типов $\tau_i$ не находится в нормальной форме. Тогда заменим $\tau_i$ на $\tau_i^*$.
+     \item Шаги $1$ и $2$ аналогичны Алгоритму \ref{алгоритм без эты}.
+     
+     \item $3_{\wedge \eta}$. Один из типов $\tau_i$ -- это типовая переменная. Тогда $X$ не может быть абстракцией и должен быть (возможно, пустой) аппликацией некоторой головной переменной, взятой из контекста, к термам. В этом случае необходимо недетерминированно выбрать переменную $x$ и число $k \geqslant 0$ таким образом, чтобы  $\Gamma_i \vdash x : \rho_i^1 \to \dots \to \rho_i^k \to \tau_i$ для всех $i = 1 \dots n$. Тогда решение --  $X = x Z^1 \dots Z^k$, где $Z^i$ -- решение системы $(\Gamma_1 \vdash Z^i : \rho_1^i) ,\dots, (\Gamma_n \vdash Z^i : \rho_n^i)$. Здесь $k$ систем независимы и могут быть решены параллельно.
+     
+     Следствие~\ref{прояснение} описывает, как именно устроен недетерминированный выбор $x$, $k$ и $\rho_i^j$.
+     
+\end{itemize}
+
+Аналогично алгоритму \ref{алгоритм без эты}, если ни одно из преобразований применить невозможно, система не имеет решения. 
+
+\end{algorithm}
+
+\subsection{Отличия алгоритмов}
+
+В \cite{kusmierek_07} в качестве населяющего алгоритма для системы $\lambda_\wedge$ приведён алгоритм, почти совпадающий с Алгоритмом 3, описанным выше. Однако на следующем примере можно убедиться, что данный алгоритм не является полным в системе $\lambda_\wedge$.
+
+Пусть задача -- $p \colon \alpha \to \beta \wedge \gamma, q \colon \alpha \vdash X \colon \beta$. Алгоритм должен произвести преобразование $3_{\wedge \eta}$, но в контексте нет такого $x$, что $p \colon \alpha \to \beta \wedge \gamma, q \colon \alpha \vdash x \colon \dots \to \beta$, поскольку, согласно Лемме \ref{существенность: типизация}, утверждение о типизации $p \colon \alpha \to \beta \wedge \gamma \vdash p \colon \alpha \to \beta$ неверно в $\lambda_\wedge$. Поэтому алгоритм завершится, не найдя решение $X = pq$. 
+Но преобразование $3_\wedge$ применить можно: $p \colon \alpha \to \beta \wedge \gamma, q \colon \alpha \vdash \lambda z . pz \colon \alpha \to \beta$. Здесь $\lambda$ позволяет применить $(I \to)$ и удалить $\to$.
+
+
+\section{Свойства алгоритма}
+
+В этом разделе будут доказаны свойства Алгоритма \ref{alg} для системы $\lambda_\wedge_\eta$. А именно, его корректность (soundness), полнота (completeness), завершаемость (termination) на типах ранга $\leqslant 2$.
+
+
+\subsection{Корректность}
+
+Корректность алгоритма означает, что ответ, данный им, удовлетворяет входным условиям. То есть если некий терм был найден, то он действительно типизируется заданным типом.
+
+\begin{theorem}[Soundness]
+Если алгоритм находит терм $M$ для входного типа $\tau$, то $\vdash M \colon \tau$
+\end{theorem}
+\begin{proof}
+Усилим утверждение: докажем, что алгоритм корректно решает систему задач. Доказательство -- индукция по количеству шагов алгоритма. В базе индукции используется аксиома $(Ax)$. В переходах индукции в шагах $1$, $2$ и $3_\wedge_\eta$ используются правила вывода $(I \wedge)$, $(I \to)$ и $(E \to)$ соответственно.
+\end{proof}
+
+\subsection{Полнота}
+
+Полнота -- гораздо более содержательное свойство. Оно означает, что если существует терм заданного типа, то алгоритм обязательно найдёт или его, или другой терм этого типа. В нашем случае это будет терм в так называемой длинной форме.
+Далее будет доказан ряд лемм, имеющих отношение к преобразованию $3_\wedge_\eta$ и проясняющих его смысл. 
+
+\begin{lemma} \label{необходимая типизация}
+
+Пусть $x$ -- переменная, $M_i$ -- термы, $\tau$ -- тип в нормальной форме без пересечений на верхнем уровне (см. следствие \ref{normal form unit}). Тогда равносильно: 
+    $$\Gamma \vdash x M_1 \dots M_k \colon \tau$$ 
+    $$\iff$$
+    $$\Gamma \vdash x \colon \alpha_1 \to \dots \to \alpha_k \to \tau \text{ и } \Gamma \vdash M_i \colon \alpha_i \text{ для } i = 1 \dots k$$
+\end{lemma}
+
+\begin{proof}
+    Докажем равносильность в обе стороны.
+\begin{itemize}
+    \item [\Leftarrow )] применяя правило $(E\to)$ $k$ раз, получаем в точности необходимое утверждение о типизации.
+    \item [\Rightarrow )] Если $k = 0$, то утверждение леммы очевидно. Иначе докажем индукцией по размеру дерева вывода (анализируя дерево с конца, аналогично доказательству Леммы \ref{существенность: типизация}). Рассуждения будет удобнее провести в системе $\lambda_\wedge_\leqslant$~(\ref{rules subtype}), поскольку в ней меньше правил вывода.
+    
+    
+    Какое правило вывода могло быть применено последним, чтобы получить утверждение $\Gamma \vdash x M_1 \dots M_k \colon \tau$? Это не могло быть $(Ax)$, так как оно типизирует переменную; это не могло быть $(I \to)$, так как оно типизирует лямбда абстракцию; это не могло быть $(I \wedge)$, поскольку в $\tau$ нет пересечений на верхнем уровне. Таким образом, могли быть применены только два правила: $(\leqslant)$ или $(E \to)$. 
+    
+    Согласно Лемме~\ref{normal form unit}, $\tau$ имеет вид $\rho_1 \to \cdots \to \rho_m \to \beta$, где $\beta$ --- типовая переменная. По Лемме~\ref{подтип стрелки}, подтип $\tau$ тогда обязан иметь вид $\varphi_1 \wedge (\ob{\rho_1} \to \varphi_2 \wedge (\ob{\rho_2} \to \varphi_3 \wedge \dots(\ob{\rho_k} \to \beta)\dots))$. К такой типизации можно или снова применить $(\leqslant)$, получив нечто такой же формы (поскольку $\ub{\ub{\tau}} = \ub{\tau}$) или применить $(I \wedge)$, получив в одной из веток нечто той же формы. Так или иначе, в определённый момент будет применено $(E \to)$ к $\ub{\tau}$.
+    
+    Таким образом, в общем случае дерево вывода имеет следующий вид: 
+    $$\infer*[(\leqslant), (I \wedge)]{\Gamma \vdash x M_1 \dots M_k \colon \tau}
+                          {\infer[(E \to)]{\Gamma \vdash x M_1 \dots M_k \colon \ub{\tau}}
+                                                {\infer*{\Gamma \vdash x M_1 \dots M_{k - 1} \colon \alpha_k \to \ub{\tau}}{} &
+                                                 \infer*{\Gamma \vdash M_k \colon \alpha_k}}{}}$$
+    Поскольку $\alpha_k \to \ub{\tau} \leqslant \alpha_k \to \tau$, верно утверждение о типизации $\Gamma \vdash x M_1 \dots M_{k - 1} \colon \alpha_k \to \tau$, которое подходит под условия леммы. Поэтому, применив те же рассуждения ещё $k - 1$ раз, получим $\Gamma \vdash x \colon \alpha_1 \to \ub{\alpha_2 \to \cdots \to \alpha_k \to \tau}$, а также $\Gamma \vdash M_i \colon \alpha_i \text{ для } i = 1 \dots k$. 
+    
+    Легко видеть, что $\alpha_1 \to \ub{\alpha_2 \to \cdots \to \alpha_k \to \tau} \leqslant \alpha_1 \to \cdots \to \alpha_k \to \tau$, поэтому мы можем применить $(\leqslant)$ и получить необходимую типизацию.
+\end{itemize}
+\end{proof}
+
+\begin{notice}
+    Условие о том, что $\tau$ -- тип без пересечений на верхнем уровне, существенно. Так, например, для $\Gamma = \{x \colon (\alpha \to \beta) \wedge (\gamma \to \delta), M \colon (\alpha \wedge \gamma)  \}$, $\Gamma \vdash xM \colon \beta \wedge \gamma$, но при этом $\Gamma \nvdash x \colon \cdots \to \beta \wedge \gamma$.
+\end{notice}
+
+\begin{notice}
+    Условие о том, что $\tau$ -- тип в нормальной форме, существенно. Так, например, для $\Gamma = \{x \colon (\alpha \to \varphi \to \beta) \wedge (\gamma \to \varphi \to \delta), M \colon (\alpha \wedge \gamma)  \}$, $\Gamma \vdash xM \colon \varphi \to (\beta \wedge \gamma)$, но при этом $\Gamma \nvdash x \colon \cdots \to \varphi \to (\beta \wedge \gamma)$.
+\end{notice}
+
+\begin{corollary} \label{в контексте} 
+    В условиях предыдущей леммы, при выполнении любой из равносильных частей, $\Gamma \ni x \colon \ub{\alpha_1 \to \cdots \to \alpha_k \to \tau}$,
+\end{corollary}
+
+\begin{proof}
+Для доказательства достаточно провести ещё один шаг в рассуждениях леммы, за тем лишь исключением, что вместо $(E \to)$ должно быть применено $(Ax)$, что и гарантирует наличие нужной типизации в контексте.
+\end{proof}
+
+\begin{corollary} \label{в контексте при разложении}
+    В условиях предыдущей леммы, при выполнении любой из равносильных частей, в контексте $\Gamma$ есть типизация $x \colon \sigma$ такая, что $\hat{\sigma^*} \ni \ob{\alpha_1} \to \cdots \to \ob{\alpha_k} \to \ub{\tau}$.
+    
+    В частности, если $\tau$ --- типовая переменная, то $\hat{\sigma^*} \ni \ \ob{\alpha_1} \to \cdots \to \ob{\alpha_k}  \to \tau$.
+\end{corollary}
+\begin{proof}
+    Воспользуемся предыдущим следствием и тем наблюдением, что 
+    $\ub{\alpha_1 \to \cdots \to \alpha_k \to \tau} = \varphi_1 \wedge (\ob{\alpha_1} \to \varphi_2 \wedge (\ob{\alpha_2} \to \varphi_3 \wedge \dots(\ob{\alpha_k} \to  \ub{\tau})\dots))$
+\end{proof}
+
+
+Следующее следствие проясняет, как с алгоритмической точки зрения устроено преобразование $3_\wedge_\eta$ в Алгоритме \ref{alg}. А именно, как выбрать $x$, $k$ и $\rho_i^j$.
+
+\begin{corollary} \label{прояснение}
+    Пусть в шаге $3_\wedge_\eta$ Алгоритма~\ref{alg}, $\tau_i$ -- типовая переменная. Тогда для того, чтобы выбрать $x$, $k$ и $\rho_i^j$ ($j = 1 \dots k$), достаточно перебрать все элементы $(x \colon \sigma)$ контекста такие, что $\hat{\sigma^*}$ содержит тип, заканчивающийся на $\tau_i$, то есть имеющий вид $\rho_i^1 \to \cdots \to \rho_i^k \to \tau_i$. 
+    
+    Для того, чтобы проверить, что выбранный $x$ удовлетворяет всем остальным задачам, а также чтобы подобрать $\rho_t^j$ (для всех $t \neq i$ и $j = 1 \dots k$), достаточно найти среди элементов $\hat{\sigma^*}$ (где $\Gamma_t \ni (x \colon \sigma)$) типы, у которых после <<отщепления>> $k$ аргументов остаётся подтип $\tau_t$, то есть имеющие вид $\rho_t^1 \to \cdots \to \rho_t^k \to \tau_t'$, где $\tau_t' \leqslant \tau_t$.
+    
+\end{corollary}
+
+\begin{theorem}[Completeness]
+Если у системы задач существует решение, то Алгоритм \ref{alg} найдёт его или другое решение. 
+\end{theorem}
+\begin{proof}
+Доказательство -- индукция по размеру наибольшего типа в задачах системы. 
+Пусть дана система $T = [\Gamma_1 \vdash X \colon \tau_1 ,\dots, \Gamma_n \vdash X \colon \tau_n]$, а $M$ --- её решение.
+
+Если один из $\tau_i$ -- тип-пересечение, алгоритм разобьёт его на два. При этом решение $M$ останется решением системы, но уменьшится размер задач системы, поэтому можно применить индукционное предположение. Аналогичные рассуждения можно провести в случае, если один из $\tau_i$ не находится в нормальной форме (при этом, чтобы размеры типов уменьшились, нужно снять пересечения, сделав несколько раз преобразование 1).
+
+Пусть ни один из типов $\tau_i$ не является пересечением. 
+Рассмотрим, как может быть устроено $M$.
+\begin{itemize}
+    \item  $M = \lambda x . M'$. 
+    
+    Тогда все типы в задачах должны быть стрелочные: $\tau_i = \alpha_i \to \beta_i$. Алгоритм перейдёт к системе $T = [\Gamma_1, x \colon \alpha_1 \vdash X' \colon \beta_1 ,\dots, \Gamma_n, x \colon \alpha_n \vdash X' \colon \beta_n]$, у которой существует решение $M'$.
+    
+    \item  $M = x M_1 M_2 \dots M_k$.
+        \begin{itemize}
+            \item Пусть все типы в задачах стрелочные: $\tau_i = \alpha_i \to \beta_i$. 
+                Тогда алгоритм, аналогично предыдущему пункту, перейдёт к системе $T = [\Gamma_1, y \colon \alpha_1 \vdash X' \colon \beta_1 ,\dots, \Gamma_n, y \colon \alpha_n \vdash X' \colon \beta_n]$.  решение которой --- $x M_1 M_2 \dots M_k y$.
+            
+            \item Пусть один из типов в задачах -- переменная: $\tau_i = \beta$. По Лемме~\ref{необходимая типизация}, верно следующее: $\Gamma_i \vdash x \colon \alpha_i^1 \to \dots \to \alpha_i^k \to \tau_i \text{ и } \Gamma_i \vdash M_j \colon \alpha_i^j \text{ для } i = 1 \dots n, j = 1 \dots k$. 
+            Поэтому, выбрав $k$ и $x$, алгоритм перейдёт к системам $T_j = [(\Gamma_1 \vdash X_j : \ob{\alpha_1^j}) ,\dots, (\Gamma_n \vdash X_j : \ob{\alpha_n^j})]$. $M_j$ является решением $j$-й системы.
+
+        \end{itemize}
+        
+\end{itemize}
+
+\end{proof}
+
+\subsection{Завершаемость}
+В предыдущих разделах было доказано, что Алгоритм~\ref{alg} выдаёт корректное решение, если оно существует. Однако от алгоритма требуется, чтобы он завершался за конечное число шагов, даже если тип пустой. В текущей системе типов такие гарантии получить невозможно: задача обитаемости неразрешима \cite{urzyczyn_99}.
+Для обеспечения завершаемости можно ограничить множество входных типов, а именно ввести ограничение на их ранг. 
+
+Понятие ранга вводится в \cite{leivant_83} и определяется как максимальная глубина вложенности <<$\wedge$>> в качестве левого аргумента <<$\to$>>. Более формальное определение следующее:
+
+\begin{definition}
+
+\begin{align*}
+    rank(\tau) &= 0 \\
+               & \text{если $\tau$ -- тип без пересечений}\\
+    rank(\sigma \wedge \tau) &= max(1, rank(\sigma), rank(\tau))\\
+    rank(\sigma \to \tau) &= max(1 + rank(\sigma), rank(\tau))\\
+               & \text{если $rank(\sigma) > 0$ или $rank(\tau) > 0$}
+\end{align*}
+
+\end{definition}
+
+Так, например, $rank(\varphi \wedge (\tau \to (\alpha \wedge \beta) \to \gamma)) = 1$
+
+\begin{lemma}\label{arrow rank}
+Если $rank(\rho_1 \to \cdots \to \rho_k \to \tau) = r > 0$, то $rank(\rho_i) < r$ для всех $i = 1 \dots k$.
+\end{lemma}
+
+Следующее доказательство во многом повторяет доказательство завершаемости из \cite{kusmierek_07}.
+\begin{theorem}[Termination]
+Пусть $\tau$ -- тип с рангом не больше двух ($rank(\tau) \leqslant 2$). Тогда Алгоритм~\ref{alg} завершается на входе $\tau$.
+\end{theorem}
+\begin{proof}
+    Пусть $rank(\tau) = 0$, что равносильно тому, что в $\tau$ нет пересечений. Тогда алгоритм завершится после линейного числа преобразований $2$ (и затем одного $3_\wedge_\eta$).
+    
+    Проследим за рангами целевых типов $\tau_i$ и типов в контекстах $\Gamma_i$.
+    
+    В преобразованиях $0$ и $1$ контексты не изменяются, а ранги типов в задачах не увеличиваются.
+    
+    В преобразовании $2$ ранг типов в задачах не увеличивается. А в контексты попадают 
+    типы $\sigma_i$, находящиеся слева от стрелки в типе $\tau_i = \sigma_i \to \rho_i$, а значит, имеющие или нулевой ранг, или хотя бы на $1$ меньший ранг, чем $\tau_i$ (см. Лемму~\ref{arrow rank}). 
+    
+    В преобразовании $3_\wedge_\eta$ контексты не изменяются, а в целевыми становятся типы $\alpha_i^j$, являющиеся аргументами в типах из контекстов, а значит, имеющие на $1$ меньший ранг (или нулевой).
+    
+    Из вышеизложенных соображений следует, что типы в контекстах всегда имеют ранг $\leqslant 1$, поэтому преобразование $3_\wedge_\eta$ порождает задачи, в которых целевые типы имеют нулевой ранг. Эти задачи решаются за линейное число шагов. 
+    Преобразования $0-2$ структурно уменьшают целевые типы, поэтому применяются лишь конечное число раз.
+    
+\end{proof}
+\bibliographystyle{ugost2008ls}
+\bibliography{diploma.bib}
+\end{document}
