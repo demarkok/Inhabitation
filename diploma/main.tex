@@ -2,13 +2,44 @@
 % поправить в файле spbau-diploma.cls
 
 \documentclass{spbau-diploma}
+
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{multicol}
+\usepackage{stmaryrd}
+\usepackage{proof}
+\usepackage{amsthm}
+\usepackage{datetime}
+\usepackage{amssymb}
+\usepackage{cite}
+
+
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH], \THEYEAR}
+
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem{lemma}[]{Лемма}[section]
+\newtheorem{corollary}{Следствие}[lemma]
+\newtheorem{proposition}[]{Предложение}
+\newtheorem{algorithm}{Алгоритм}[section]
+\newtheorem{notice}[]{Замечание}[lemma]
+\newtheorem{definition}{Определение}[section]
+
+\newcommand{\ttt}[1] {\texttt{#1}}
+\newcommand{\ob}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\ub}[1] {\mkern 1.5mu\underline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+
 \begin{document}
 % Год, город, название университета и факультета предопределены,
 % но можно и поменять.
 % Если англоязычная титульная страница не нужна, то ее можно просто удалить.
 \filltitle{ru}{
     % chair              = {Кафедра математических и информационных технологий},
-    title              = {Задача обитаемости в системах типов низкого ранга},
+    title              = {ЗАДАЧА ОБИТАЕМОСТИ В СИСТЕМАХ ТИПОВ НИЗКОГО РАНГА},
     % Здесь указывается тип работы. Возможные значения:
     %   coursework - Курсовая работа
     %   diploma - Диплом специалиста
@@ -18,8 +49,8 @@
     position           = {студента},
     group              = 666,
     author             = {Кайсин Илья Сергеевич},
-    supervisorPosition = {к.\,ф.-м.\,н., профессор},
-    supervisor         = {Москвин Д.\,Н.},
+    supervisorPosition = {к.\,ф.-м.\,н., доцент},
+    supervisor         = {Москвин Денис Николаевич},
     reviewerPosition   = {},
     reviewer           = {Пеленицын А.\,М},
     chairHeadPosition  = {д.\,ф.-м.\,н., профессор},
@@ -44,7 +75,7 @@
 \section{Обзор предметной области}
 \subfile{sections/1_a_domain_review}
 
-\section{Система типов $\lambda_\wedge_\eta$}
+\section{Система типов $\lambda_{\wedge \eta}$}
 \subfile{sections/2_the_system}
 
 \section{Населяющий алгоритм}
@@ -54,6 +85,6 @@
 \subfile{sections/4_properties}
 
 
-\bibliographystyle{ugost2008ls}
+\bibliographystyle{ugost2008my}
 \bibliography{diploma.bib}
 \end{document}

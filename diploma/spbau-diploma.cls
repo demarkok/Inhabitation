@@ -129,7 +129,7 @@
     \ifthenelse{\equal{#1}{ru}}
         {
         \presetkeys[#1]{mytitle}{
-          university = {Федеральное государственное автономное образовательное учреждение высшего образования «Национальный исследовательский университет «Высшая школа экономики»},
+          university = {«Национальный исследовательский университет\\ «Высшая школа экономики»},
           faculty = {Факультет Санкт-Петербургская школа физико-математических и компьютерных наук\\Департамент информатики\\Основная образовательная программа\\Прикладная математика и информатика},
           city = {Санкт-Петербург},
           year = {\the\year},
@@ -157,7 +157,11 @@
     \fancyhf{}  % clear all header and footer fields
     \renewcommand{\headrulewidth}{0pt}  % remove head ruler
     %% В верхнем колонтитуле будет университет и кафедра
-    \chead{\large \my@title@university@ru \\ \my@title@faculty@ru \\ \vskip 1em{\large \my@title@chair@ru \\}}
+    \chead{
+    {\large Правительство Российской Федерации\\Федеральное государственное автономное образовательное учреждение высшего образования\\}
+    {\large \my@title@university@ru} \\ 
+    \vskip 1em
+    {\large \my@title@faculty@ru \\ \vskip 1em{\large \my@title@chair@ru \\}}}
     %% В нижнем колонтитуле город и год
     \cfoot{\large\parbox[b]{\textwidth}{\centering \my@title@city@ru\\ \my@title@year@ru}}
 }
@@ -168,13 +172,9 @@
 \thispagestyle{titleru}
 \begin{center}
     \vspace*{0.25\textheight}
-    {\Large\my@title@author@ru}
     
-    \vskip 2em
-    {\Huge \@title\\}
-    
-    \vskip 1em
-    {\large 
+    \vskip 7em
+    {\Large 
     \ifthenelse{\equal{\my@title@type@ru}{coursework}}
     {Курсовая работа}
     {\ifthenelse{\equal{\my@title@type@ru}{diploma}}
@@ -182,24 +182,28 @@
     {\ifthenelse{\equal{\my@title@type@ru}{master}}
     {Магистерская диссертация}
     {\ifthenelse{\equal{\my@title@type@ru}{bachelor}}
-    {Выпускная квалификационная работа}
+    {ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}
     }}}
     \\}
-    \vskip 2em
-    \ifthenelse{\equal{\my@title@type@ru}{coursework}}
-    {\normalsize \raggedleft 
-    Научный руководитель:\\
-    \my@title@supervisorPosition@ru\ \my@title@supervisor@ru
+    \vskip 0.7em
+    
+    {\Large на тему}
+    
+    \vskip 1em
+    {\Large \@title\\}
+    
+    \vskip 7em
+    
+    {\large \flushleft 
+    Выполнил студент группы БПМ151, 4 курса,\\
+    \my@title@author@ru \sigspace
     }
-    {\normalsize \raggedleft 
-    Допущена к защите.\\
-    Зав. кафедрой:\\
-    \my@title@chairHeadPosition@ru\ \my@title@chairHead@ru\sigspace
+
+    {\large \flushleft 
     Научный руководитель:\\
     \my@title@supervisorPosition@ru\ \my@title@supervisor@ru\sigspace
-    Рецензент:\\
-    \my@title@reviewerPosition@ru\ \my@title@reviewer@ru
     }
+    
 \end{center}
 \end{titlepage}
 }
@@ -310,104 +314,3 @@
 
 \let\savenumberline\numberline
 \def\numberline#1{\savenumberline{#1.}}
-
-
-
-
-
-
-
-
-
-\usepackage{amsmath}
-\usepackage{subfiles}
-\usepackage{graphicx}
-\usepackage[colorinlistoftodos]{todonotes}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\usepackage{listings}
-\usepackage{multicol}
-\usepackage{stmaryrd}
-\usepackage{proof}
-\usepackage{amsthm}
-\usepackage{datetime}
-\usepackage{amssymb}
-\usepackage{cite}
-
-
-\newdateformat{monthyeardate}{%
-  \monthname[\THEMONTH], \THEYEAR}
-
-\newtheorem{theorem}[]{Теорема}
-
-\newtheorem{lemma}[]{Лемма}[section]
-
-\newtheorem{corollary}{Следствие}[lemma]
-
-\newtheorem{proposition}[]{Предложение}
-
-\newtheorem{algorithm}[]{Алгоритм}
-
-\newtheorem{notice}[]{Замечание}[lemma]
-
-
-\newtheorem{definition}[]{Определение}
-
-
-\lstset{
-  frame=none,
-  xleftmargin=2pt,
-  stepnumber=1,
-  numbers=left,
-  numbersep=5pt,
-  numberstyle=\ttfamily\tiny\color[gray]{0.3},
-  belowcaptionskip=\bigskipamount,
-  captionpos=b,
-  escapeinside={*'}{'*},
-  language=haskell,
-  tabsize=2,
-  emphstyle={\bf},
-  commentstyle=\it,
-  stringstyle=\mdseries\rmfamily,
-  showspaces=false,
-  keywordstyle=\bfseries\rmfamily,
-  columns=flexible,
-  basicstyle=\small\sffamily,
-  showstringspaces=false,
-  morecomment=[l]\%,
-}
-
-
-
-\lstdefinelanguage{Lambda}{%
-  morekeywords={%
-    nmap,
-    conmap,
-    id
-  },%
-  morekeywords={[2]int},   % types go here
-  otherkeywords={:, ., =}, % operators go here
-  literate={% replace strings with symbols
-    {->}{{$\to$}}{2}
-    {lam}{{$\lambda$}}{1}
-    {Lam}{{$\Lambda$}}{1}
-    {phi}{{$\varphi$}}{1}
-    {psi}{{$\psi$}}{1}
-    {all}{{$\forall$}}{1}
-  },
-  basicstyle={\sffamily},
-  keywordstyle={\bfseries},
-  keywordstyle={[2]\itshape}, % style for types
-  keepspaces,
-  mathescape % optional
-}[keywords,comments,strings]%
-
-
-\newcommand{\ttt}[1] {\texttt{#1}}
-\newcommand{\tttt}[1] {\begin{sloppypar}\ttt{#1}\end{sloppypar}}
-\newcommand{\code}[1] {\begin{lstlisting}{#1}\end{lstlisting}}
-
-\newcommand{\ob}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
-\newcommand{\ub}[1] {\mkern 1.5mu\underline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
-
-\newcommand{\llb}[0] {\llbracket}
-\newcommand{\rrb}[0] {\rrbracket}
