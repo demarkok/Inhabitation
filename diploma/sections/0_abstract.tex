@@ -3,8 +3,17 @@
 
 Типы являются важной абстракцией в языках программирования. Ограничивая множество корректных программ, они позволяют программистам писать более безопасный код и избегать ошибок. Теория типов -- математический аппарат, формализующий данную область. Одним из базовых вопросов теории типов является {\it задача обитаемости}: <<Существует ли терм (выражение в языке) заданного типа?>>. Задача обитаемости может быть поставлена в различных {\it системах типов} (моделях, описывающих часть языка программирования, относящуюся к типам). Цель данной работы -- решить проблему обитаемости для некоторой определённой системы типов, а именно для просто типизированного лямбда исчисления с пересечениями второго ранга и подтипизацией. Недавние работы показывают, что задача обитаемости неразрешима в системах без ограничения на ранг \cite{urzyczyn_97} и EXPSPACE-полной в системе с пересечениями второго ранга, но без подтипизации \cite{kusmierek_07, urzyczyn_09}. Однако система и с пересечениями второго ранга, и с подтипизацией до сих пор не была изучена. В данной работе мы показываем, что задача обитаемости разрешима в этой системе. Для этого мы приводим алгоритм, решающий её, доказывая его корректность, полноту и завершаемость. Помимо этого, работа закрывает некоторые неточности предыдущих статей и предлагает новые подходы к реализации описанных в них алгоритмов.
 
+\vspace*{\fill}
+
+Ключевые слова: теория типов, лямбда исчисление, типы-пересечения, ранг типа, подтипизация, проблема обитаемости.
+
+
 \newpage
 
 Types are an important abstraction in programming languages. They enable to program in a safer way and avoid bugs setting restriction on programs and distinguishing correct and incorrect ones. Type theory is the mathematical apparatus for this domain, one of whose basic questions is the inhabitation, usually defined as follows: «does there exist a term (some expression in the language) of a given type?». The question could be raised in different type systems (models of type-related programming languages parts), the goal of this project is to solve this question in some specific systems. Namely, simply typed lambda calculus with type intersection of rank two (type system restriction) and subtyping. Recently presented works show that the problem is undecidable in type systems without rank limitation \cite{urzyczyn_97} and EXPSPACE-complete without subtyping \cite{kusmierek_07, urzyczyn_09}, but the system with both of them is not studied yet. The approaches include an adaptation of an existing in similar type systems inhabitation algorithm, proof of its correctness and soundness, implementing and testing the algorithm in Haskell programming language. The preliminary results also cover several flaws in the previous works and suggest that the inhabitation algorithm scheme could be improved in terms of efficiency.
+
+\vspace*{\fill}
+
+Keywords: type theory, lambda calculus, intersection types, type rank, subtyping, type inhabitation problem.
 
 \end{document}
