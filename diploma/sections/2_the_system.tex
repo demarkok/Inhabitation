@@ -21,7 +21,7 @@
 \subsection{Подтипизация}
 
 
-Определим на типах отношение подтипизации. С теоретико-множественной точки зрения подтпизация соответствует отношению <<быть подмножеством>>: если терм типизируется $\sigma$, то он типизируется всеми надтипами $\sigma$, то есть такими $\tau$, что $\sigma \leqslant \tau$. Отношение определим следующими аксиомами и правилами, аналогично определению из \cite{hindley_82}.
+Определим на типах отношение подтипизации. С теоретико-множественной точки зрения подтпизация соответствует отношению <<быть подмножеством>>: если терм типизируется $\sigma$, то он типизируется всеми надтипами $\sigma$, то есть такими $\tau$, что $\sigma \leqslant \tau$. Отношение определим следующими аксиомами и правилами, аналогично определению из \cite{hindley_1982}.
 
 \begin{equation} \label{rules leq}
 \begin{aligned}
@@ -37,7 +37,7 @@
 \end{equation}
 
 
-В \cite{hindley_92} показано, что правило $(\eta)$ может быть заменено следующим правилом:
+В \cite{hindley_1992} показано, что правило $(\eta)$ может быть заменено следующим правилом:
 
 $$\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}$$
 
@@ -70,7 +70,7 @@ $\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
 
 В частности, это означает, что переход к эквивалентному типу не влияет на его обитаемость.
 
-Легко видеть, что отношение <<$\sim$>> является отношением конгруэнтности (в смысле \cite{barendregt_93}) а именно, верна следующая Лемма:
+Легко видеть, что отношение <<$\sim$>> является отношением конгруэнтности (в смысле \cite{barendregt_2013}) а именно, верна следующая Лемма:
 \begin{lemma}
 Пусть $\alpha, \beta, \gamma, \delta$ -- типы. 
 Если $\alpha \sim \beta$ и $\gamma \sim \delta$, то $(\alpha \to \gamma) \sim (\beta \to \delta)$, а также $(\alpha \wedge \gamma) \sim (\beta \wedge \delta)$.
@@ -88,7 +88,7 @@ $\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
 \end{definition}
 
 
-В \cite{hindley_82} показана следующая экивалентность: 
+В \cite{hindley_1982} показана следующая экивалентность: 
 \begin{lemma}
 $\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamma)$
 \end{lemma}
@@ -127,7 +127,7 @@ $\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamm
 Типы в нормальной форме без пересечений на верхнем уровне --- в точности типы вида $\dots \to \alpha$, где $\alpha$ -- некоторая типовая переменная.
 \end{corollary}
 
-В \cite{hindley_82} показано, что отношение $(\leqslant)$ рекурсивно и существует алгоритм, позволяющий определить для двух типов $\alpha$ и $\beta$ верно ли, что $\alpha \leqslant \beta$:
+В \cite{hindley_1982} показано, что отношение $(\leqslant)$ рекурсивно и существует алгоритм, позволяющий определить для двух типов $\alpha$ и $\beta$ верно ли, что $\alpha \leqslant \beta$:
 
 
 \begin{algorithm} \label{subt algo}
