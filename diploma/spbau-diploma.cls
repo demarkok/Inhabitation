@@ -272,13 +272,13 @@
 \newcounter{titlepages}
 \setcounter{titlepages}{1}
 \begin{spacing}{1.0}
-\ifthenelse{\isundefined{\my@title@title@ru}}{}{
+% \ifthenelse{\isundefined{\my@title@title@ru}}{}{
   % fancyhdr set height of the top/bottom headers automatically
   % so set them to zero to be sure that he does it 
-  \setlength{\headheight}{0pt}
-  \setlength{\footskip}{0pt}
-  \maketitleru\addtocounter{titlepages}{1}
-}
+%   \setlength{\headheight}{0pt}
+%   \setlength{\footskip}{0pt}
+%   \maketitleru\addtocounter{titlepages}{1}
+% }
 % \ifthenelse{\isundefined{\my@title@title@en}}{}{
 %   % fancyhdr already set height of the top/bottom headers on the previous page (titleru) 
 %   % but on this page the headers' height might be different
