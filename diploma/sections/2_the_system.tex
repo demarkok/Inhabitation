@@ -73,8 +73,8 @@ $\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
 
 Легко видеть, что отношение <<$\sim$>> является отношением конгруэнтности (в смысле \cite{barendregt_2013}) а именно, верна следующая Лемма:
 \begin{lemma}
-Пусть $\alpha, \beta, \gamma, \delta$ -- типы. 
-Если $\alpha \sim \beta$ и $\gamma \sim \delta$, то $(\alpha \to \gamma) \sim (\beta \to \delta)$, а также $(\alpha \wedge \gamma) \sim (\beta \wedge \delta)$.
+Пусть $\pi, \rho, \sigma, \tau$ -- типы. 
+Если $\pi \sim \rho$ и $\sigma \sim \tau$, то $(\pi \to \sigma) \sim (\rho \to \tau)$, а также $(\pi \wedge \sigma) \sim (\rho \wedge \tau)$.
 \end{lemma}
 
 
@@ -90,8 +90,8 @@ $\sigma \sim \tau \iff \sigma \leqslant \tau$ и $\tau \leqslant \sigma$
 
 
 В \cite{hindley_1982} показана следующая экивалентность: 
-\begin{lemma}
-$\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamma)$
+\begin{lemma} Для любых типов $\rho, \sigma, \tau$, 
+$\rho \to \sigma \wedge \tau \sim (\rho \to \sigma) \wedge (\rho \to \tau)$
 \end{lemma}
 
 Применяя её многократно, мы можем привести тип к нормальной форме. А именно, введём операцию <<*>> следующим образом: 
@@ -120,13 +120,28 @@ $\alpha \to \beta \wedge \gamma \sim (\alpha \to \beta) \wedge (\alpha \to \gamm
 
 Общий вид типа в нормальной форме после применения <<*>> описывается следующей леммой:
 
-\begin{lemma}
+\begin{lemma} \label{normal form form}
 Для любого типа $\tau$: $\tau^* = \bigwedge \limits_i (\varphi_i_1 \to \cdots \to \varphi_i_{k i} \to \alpha_i$), где $\alpha_i$ - типовая переменная.
 \end{lemma}
 
 \begin{corollary} \label{normal form unit}
 Типы в нормальной форме без пересечений на верхнем уровне --- в точности типы вида $\dots \to \alpha$, где $\alpha$ -- некоторая типовая переменная.
 \end{corollary}
+
+\begin{definition} \label{typesize}
+Мощностью типа назовём следующую величину: 
+\begin{align*}
+|\alpha| &= 1 \\
+         &\text{если $\alpha$ --- типовая переменная }\\
+|\rho_1 \to \rho_2 \to \cdots \to \rho_k \to \alpha| &= 2 + \Sigma\limits_{i = 1}^k |\rho_i|\\
+                                                     &\text{если $\alpha$ --- типовая переменная и $k > 0$}\\
+|\sigma \wedge \tau| &= 1 + |\sigma| + |\tau|\\
+|\tau| &= |\tau^*|\\
+       &\text{если $\tau$ не в нормальной форме}
+\end{align*}
+\end{definition}
+
+Используя индукцию и Лемму \ref{normal form form}, легко показать, что мощность типа корректно определена. Интуитивно, мощность типа $\tau$ -- количество различных типов-подвыражений, которые участвуют в $\tau$ и которые могут быть рассмотрены описанным далее алгоритмом. Поэтому по мощности типа удобно проводить индукцию, доказывающую свойства алгоритма.
 
 В \cite{hindley_1982} показано, что отношение $(\leqslant)$ рекурсивно и существует алгоритм, позволяющий определить для двух типов $\alpha$ и $\beta$ верно ли, что $\alpha \leqslant \beta$:
 
