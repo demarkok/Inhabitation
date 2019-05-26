@@ -45,7 +45,7 @@
     $$\infer*[(\leqslant), (I \wedge)]{\Gamma \vdash x M_1 \dots M_k \colon \tau}
                           {\infer[(E \to)]{\Gamma \vdash x M_1 \dots M_k \colon \ub{\tau}}
                           {\infer*{\Gamma \vdash x M_1 \dots M_{k - 1} \colon \rho_k \to \ub{\tau}}{} & \infer*{\Gamma \vdash M_k \colon \rho_k}}{}}$$
-    Поскольку $\rho_k \to \ub{\tau} \leqslant \rho_k \to \tau$, верно утверждение о типизации $\Gamma \vdash x M_1 \dots M_{k - 1} \colon \rho_k \to \tau$, которое подходит под условия леммы. Поэтому, применив те же рассуждения ещё $k - 1$ раз, получим $\Gamma \vdash x \colon \rho_1 \to \ub{\rho_2 \to \cdots \to \rho_k \to \tau}$, а также $\Gamma \vdash M_i \colon \rho_i \text{ для } i = 1 \dots k$. 
+    Поскольку $\rho_k \to \ub{\tau} \leqslant \rho_k \to \tau$, верно утверждение о типизации $\Gamma \vdash x M_1 \dots M_{k - 1} \colon $ $ \rho_k \to \tau$, которое подходит под условия леммы. Поэтому, применив те же рассуждения ещё $k - 1$ раз, получим $\Gamma \vdash x \colon \rho_1 \to \ub{\rho_2 \to \cdots \to \rho_k \to \tau}$, а также $\Gamma \vdash M_i \colon \rho_i \text{ для } i = 1 \dots k$. 
     
     Легко видеть, что $\rho_1 \to \ub{\rho_2 \to \cdots \to \rho_k \to \tau} \leqslant \rho_1 \to \cdots \to \rho_k \to \tau$, поэтому мы можем применить $(\leqslant)$ и получить необходимую типизацию.
 \end{itemize}
@@ -108,7 +108,7 @@
     \item $M = x M_1 M_2 \dots M_k$
         \begin{enumerate}
             \item \label{case:a} Пусть все типы в задачах стрелочные: $\tau_i = \sigma_i \to \rho_i$. 
-                Тогда алгоритм, аналогично предыдущему пункту, перейдёт к системе $T = [\Gamma_1, y \colon \sigma_1 \vdash X' \colon \rho_1 ,\dots, \Gamma_n, y \colon \sigma_n \vdash X' \colon \rho_n]$.  решение которой --- $x M_1 M_2 \dots M_k y$.
+                Тогда алгоритм, аналогично предыдущему пункту, перейдёт к системе $T = [\Gamma_1, y \colon \sigma_1 \vdash X' \colon \rho_1 ,\dots, $ $ \Gamma_n, y \colon \sigma_n \vdash X' \colon \rho_n]$, решение которой -- $x M_1 M_2 \dots M_k y$.
             
             Стоит отметить, что в этом случае длина решения увеличивается, поэтому индукционное предположение нельзя применить сразу. Ниже этот вопрос проясняется.
             
