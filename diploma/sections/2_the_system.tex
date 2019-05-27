@@ -13,7 +13,7 @@
 \infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
 \infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
 \infer[(E\wedge)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash M \colon \sigma \wedge \tau}\\[2pt]
-\infer[(\eta)]{\Gamma \vdash (\lambda x . M x) \colon \sigma}{\Gamma \vdash M \colon \sigma}
+\infer[(\eta)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash (\lambda x . M x) \colon \sigma}
 
 \end{aligned}
 \end{equation}
