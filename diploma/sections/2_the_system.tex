@@ -6,36 +6,35 @@
 Кроме того, вводится ещё одно дополнительное правило $(\eta)$, позволяющее проводить эта-редукцию. 
 
 Таким образом, система состоит из следующих правил вывода: $Ax$, $I\to$, $E\to$, $I\wedge$, $E\wedge$, $\eta$.
-\begin{equation} \label{rules eta}
-\begin{aligned}
-\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
-\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
-\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
-\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
-\infer[(E\wedge)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash M \colon \sigma \wedge \tau}\\[2pt]
-\infer[(\eta)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash (\lambda x . M x) \colon \sigma}
 
-\end{aligned}
-\end{equation}
+\begin{definition}[Правила вывода системы $\lambda_{\wedge \eta}$]
+\begin{mathpar}
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau} \\
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma} \\
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau} \\
+\infer[(E\wedge)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash M \colon \sigma \wedge \tau}\\
+\infer[(\eta)]{\Gamma \vdash M \colon \sigma}{\Gamma \vdash (\lambda x . M x) \colon \sigma}
+\end{mathpar}
+\end{definition}
 
 \subsection{Подтипизация}
 
 
 Определим на типах отношение подтипизации. С теоретико-множественной точки зрения подтпизация соответствует отношению <<быть подмножеством>>: если терм типизируется $\sigma$, то он типизируется всеми надтипами $\sigma$, то есть такими $\tau$, что $\sigma \leqslant \tau$. Отношение определим следующими аксиомами и правилами, аналогично определению из \cite{hindley_1982}.
-\newpage
+% \newpage
 
-\begin{equation} \label{rules leq}
-\begin{aligned}
-\infer[(A1)]{\sigma \leqslant \sigma}{} \\[2pt]
-\infer[(A2)]{\sigma \leqslant \sigma \wedge \sigma}{} \\[2pt]
-\infer[(A3)]{\sigma \wedge \tau \leqslant \sigma}{} \\[2pt]
-\infer[(A4)]{\sigma \wedge \tau \leqslant \tau}{} \\[2pt]
-\infer[(A5)]{(\sigma \to \tau_1) \wedge (\sigma \to \tau_2) \leqslant \sigma \to (\tau_1 \wedge \tau_2)}{} \\[2pt]
-\infer[(R1)]{\sigma \wedge \tau \leqslant \sigma' \wedge \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
-\infer[(R2)]{\sigma' \to \tau \leqslant \sigma \to \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\[2pt]
+\begin{definition}[Правила вывода отношения подтипизации]
+\begin{mathpar}
+\infer[(A1)]{\sigma \leqslant \sigma}{} \\
+\infer[(A2)]{\sigma \leqslant \sigma \wedge \sigma}{} \\
+\infer[(A3)]{\sigma \wedge \tau \leqslant \sigma}{} \\
+\infer[(A4)]{\sigma \wedge \tau \leqslant \tau}{} \\
+\infer[(A5)]{(\sigma \to \tau_1) \wedge (\sigma \to \tau_2) \leqslant \sigma \to (\tau_1 \wedge \tau_2)}{} \\
+\infer[(R1)]{\sigma \wedge \tau \leqslant \sigma' \wedge \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\
+\infer[(R2)]{\sigma' \to \tau \leqslant \sigma \to \tau'}{\sigma \leqslant \sigma' & \tau \leqslant \tau'} \\
 \infer[(R3)]{\tau_1 \leqslant \tau_3}{\tau_1 \leqslant \tau_2 & \tau_2 \leqslant \tau_3} 
-\end{aligned}
-\end{equation}
+\end{mathpar}
+\end{definition}
 
 
 В \cite{hindley_1992} показано, что правило $(\eta)$ может быть заменено следующим правилом:
@@ -44,16 +43,16 @@ $$\infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma 
 
 На самом деле, поскольку $\sigma \wedge \tau \leqslant \sigma$ и $\sigma \wedge \tau \leqslant \tau$, правило $(E \wedge)$ также избыточно. Таким образом, правила в этой системе следующие: 
 
-\begin{equation} \label{rules subtype}
-\begin{aligned}
-\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\[2pt]
-\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\[2pt]
-\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\[2pt]
-\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\[2pt]
+\begin{definition}[Правила вывода системы $\lambda_{\wedge \leqslant}$]
+\begin{mathpar}
+\infer[(Ax)]{\Gamma, x \colon \tau \vdash x \colon \tau}{}\\
+\infer[(I\to)]{\Gamma \vdash (\lambda x . M) \colon \sigma \to \tau}{\Gamma, x \colon \sigma \vdash M \colon \tau}\\
+\infer[(E\to)]{\Gamma \vdash (MN) \colon \tau}{\Gamma \vdash M \colon \sigma \to \tau & \Gamma \vdash N \colon \sigma}\\
+\infer[(I\wedge)]{\Gamma \vdash M \colon \sigma \wedge \tau}{\Gamma \vdash M \colon \sigma & \Gamma \vdash M \colon \tau}\\
 \infer[(\leqslant)]{\Gamma \vdash M : \tau}{\Gamma \vdash M : \sigma & \sigma \leqslant \tau}
+\end{mathpar}
+\end{definition}
 
-\end{aligned}
-\end{equation}
 
 Полученную систему будем называть $\lambda_{\wedge \leqslant}$. Она эквивалентна $\lambda_\wedge_\eta$ в смысле типизации: утверждение типизации, верное в системе  $\lambda_{\wedge \leqslant}$, верно в $\lambda_\wedge_\eta$ и наоборот. Поэтому в контексте нашей задачи эти две системы полностью взаимозаменяемы.
 
